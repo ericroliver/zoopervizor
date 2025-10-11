@@ -13,6 +13,12 @@ export interface ZupervizorConfig {
 	statusBar: {
 		enabled: boolean;
 	};
+	bytebot: {
+		enabled: boolean;
+		maxConcurrentDelegations: number;
+		delegationTimeout: number;
+		autoCleanupCompletedAfter: number;
+	};
 }
 
 export class ConfigurationManager {
@@ -33,6 +39,12 @@ export class ConfigurationManager {
 			},
 			statusBar: {
 				enabled: config.get('statusBar.enabled', true),
+			},
+			bytebot: {
+				enabled: config.get('bytebot.enabled', true),
+				maxConcurrentDelegations: config.get('bytebot.maxConcurrentDelegations', 3),
+				delegationTimeout: config.get('bytebot.delegationTimeout', 300000),
+				autoCleanupCompletedAfter: config.get('bytebot.autoCleanupCompletedAfter', 3600000),
 			},
 		};
 	}

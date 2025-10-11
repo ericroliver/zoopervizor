@@ -67,6 +67,26 @@
           "type": "boolean",
           "default": true,
           "description": "Show status bar item"
+        },
+        "zupervizor.bytebot.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable Bytebot adapter integration"
+        },
+        "zupervizor.bytebot.maxConcurrentDelegations": {
+          "type": "number",
+          "default": 3,
+          "description": "Maximum number of concurrent delegations"
+        },
+        "zupervizor.bytebot.delegationTimeout": {
+          "type": "number",
+          "default": 300000,
+          "description": "Delegation timeout in milliseconds (default: 5 minutes)"
+        },
+        "zupervizor.bytebot.autoCleanupCompletedAfter": {
+          "type": "number",
+          "default": 3600000,
+          "description": "Auto-cleanup completed delegations after milliseconds (default: 1 hour)"
         }
       }
     }
