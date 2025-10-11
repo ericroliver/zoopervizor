@@ -56,7 +56,11 @@ Configure Zupervizor through VSCode settings (File → Preferences → Settings 
   "zupervizor.api.port": 3737,
   "zupervizor.logging.level": "info",
   "zupervizor.logging.showInOutput": true,
-  "zupervizor.statusBar.enabled": true
+  "zupervizor.statusBar.enabled": true,
+  "zupervizor.bytebot.enabled": true,
+  "zupervizor.bytebot.maxConcurrentDelegations": 3,
+  "zupervizor.bytebot.delegationTimeout": 300000,
+  "zupervizor.bytebot.autoCleanupCompletedAfter": 3600000
 }
 ```
 
@@ -70,6 +74,10 @@ Configure Zupervizor through VSCode settings (File → Preferences → Settings 
 | `zupervizor.logging.level` | string | `"info"` | Logging level (debug, info, warn, error) |
 | `zupervizor.logging.showInOutput` | boolean | `true` | Show logs in Output channel |
 | `zupervizor.statusBar.enabled` | boolean | `true` | Show status bar item |
+| `zupervizor.bytebot.enabled` | boolean | `true` | Enable/disable Bytebot adapter integration |
+| `zupervizor.bytebot.maxConcurrentDelegations` | number | `3` | Maximum concurrent delegations |
+| `zupervizor.bytebot.delegationTimeout` | number | `300000` | Delegation timeout in milliseconds (5 minutes) |
+| `zupervizor.bytebot.autoCleanupCompletedAfter` | number | `3600000` | Auto-cleanup completed delegations after milliseconds (1 hour) |
 
 ## Usage
 
@@ -254,6 +262,16 @@ Zupervizor consists of several key components:
 - **Logger**: Centralized logging system
 - **StatusBarManager**: Visual feedback in VSCode status bar
 - **API Server**: HTTP REST API and WebSocket server
+- **BytebotAdapter**: Integration layer for external agent delegation (optional)
+
+### Bytebot Integration
+
+Zupervizor includes an optional adapter layer for integrating with external agents like Bytebot. The adapter provides:
+
+- **Task Delegation**: Delegate coding tasks to Roo-Code from external agents
+- **Event Normalization**: Convert Roo-Code events to agent-friendly formats
+- **Task Coordination**: Manage multiple concurrent delegations
+- **Question Handling**: Handle interactive questions during task execution
 
 See [Architecture Plan](docs/architecture-plan.md) for detailed information.
 
@@ -262,6 +280,7 @@ See [Architecture Plan](docs/architecture-plan.md) for detailed information.
 - [Architecture Plan](docs/architecture-plan.md) - Detailed system architecture
 - [Implementation Guide](docs/implementation-guide.md) - Step-by-step implementation
 - [API Documentation](docs/api-documentation.md) - Complete API reference
+- [Bytebot Integration](docs/bytebot-integration.md) - External agent integration guide
 - [Quick Start Guide](docs/quick-start.md) - Quick start for users and developers
 
 ## Contributing
