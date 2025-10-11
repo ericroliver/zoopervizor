@@ -116,7 +116,7 @@ Channel  UI      Agents
 ## Project Structure
 
 ```
-roo-telemetry/
+zupervizor/
 ├── docs/                                    # Documentation
 │   ├── roo-code-events-integration-guide.md # Research and integration guide
 │   ├── architecture-plan.md                 # Detailed architecture

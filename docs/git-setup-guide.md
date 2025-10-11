@@ -117,7 +117,7 @@ A VSCode extension that monitors Roo-Code activities and provides an API bridge 
 1. Clone the repository:
    ```bash
    git clone <repository-url>
-   cd roo-telemetry
+   cd zupervizor
    ```
 
 2. Install dependencies:

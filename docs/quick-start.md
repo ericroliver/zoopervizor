@@ -57,7 +57,7 @@ Open VSCode Settings (Ctrl+,) and search for "Zupervizor":
 1. **Clone and Install**:
    ```bash
    git clone <repository-url>
-   cd roo-telemetry
+   cd zupervizor
    npm install
    ```
 
