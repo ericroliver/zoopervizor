@@ -1,0 +1,93 @@
+{
+  "name": "zupervizor",
+  "displayName": "Zupervizor",
+  "description": "Monitor and control Roo-Code activities with external API bridge",
+  "version": "0.1.0",
+  "publisher": "zupervizor",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "zupervizor.showOutput",
+        "title": "Zupervizor: Show Output"
+      },
+      {
+        "command": "zupervizor.toggleStatusBar",
+        "title": "Zupervizor: Toggle Status Bar"
+      },
+      {
+        "command": "zupervizor.restartServer",
+        "title": "Zupervizor: Restart API Server"
+      }
+    ],
+    "configuration": {
+      "title": "Zupervizor",
+      "properties": {
+        "zupervizor.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable Zupervizor monitoring"
+        },
+        "zupervizor.api.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable API server for external agents"
+        },
+        "zupervizor.api.port": {
+          "type": "number",
+          "default": 3737,
+          "description": "Port for API server"
+        },
+        "zupervizor.logging.level": {
+          "type": "string",
+          "enum": [
+            "debug",
+            "info",
+            "warn",
+            "error"
+          ],
+          "default": "info",
+          "description": "Logging level"
+        },
+        "zupervizor.logging.showInOutput": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show logs in Output channel"
+        },
+        "zupervizor.statusBar.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show status bar item"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package",
+    "lint": "eslint src --ext ts"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "ws": "^8.14.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.20",
+    "@types/node": "^20.8.0",
+    "@types/vscode": "^1.85.0",
+    "@types/ws": "^8.5.8",
+    "@vscode/vsce": "^2.22.0",
+    "typescript": "^5.2.2"
+  }
+}
