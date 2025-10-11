@@ -12,7 +12,7 @@
 ## Project Structure
 
 ```
-roo-telemetry/
+zupervizor/
 ├── docs/
 │   ├── roo-code-events-integration-guide.md
 │   ├── architecture-plan.md
