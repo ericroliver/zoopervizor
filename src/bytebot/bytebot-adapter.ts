@@ -81,7 +81,7 @@ export class BytebotAdapter {
       // Prepare Roo-Code task options
       const taskOptions: TaskOptions = {
         text: request.task_description,
-        newTab: true,
+        newTab: false,
       };
 
       // Set mode if specified
@@ -100,12 +100,8 @@ export class BytebotAdapter {
 
       this.logger.info(`Delegation ${request.delegation_id} linked to Roo task ${rooTaskId}`);
 
-      // Emit delegation started event
-      const startedEvent = this.eventNormalizer.createProgressEvent(
-        delegation,
-        'Delegation started'
-      );
-      this.broadcastDelegationEvent(startedEvent);
+      // Note: delegation_started event will be sent automatically when taskCreated event fires
+      // This avoids sending duplicate events that could confuse Bytebot
 
       return {
         delegation_id: request.delegation_id,
@@ -177,6 +173,9 @@ export class BytebotAdapter {
         }
       }
 
+      // Clear any stored completion result
+      this.eventNormalizer.clearCompletionResult(delegationId);
+
       // Update delegation status
       this.taskCoordinator.cancelDelegation(delegationId);
 
@@ -232,15 +231,26 @@ export class BytebotAdapter {
     }
 
     // Find the delegation associated with this event
-    // For taskCreated/taskStarted, eventData.taskId should be present
     let delegation: DelegationState | undefined;
+    let taskId: string | undefined;
 
-    if (eventData.taskId) {
-      delegation = this.taskCoordinator.getDelegationByRooTask(eventData.taskId);
+    // Extract taskId based on event type
+    if (eventName === 'message') {
+      // Message events have taskId nested in the event structure
+      taskId = eventData.taskId || eventData[0]?.taskId;
+    } else {
+      // Other events have taskId directly
+      taskId = eventData.taskId || eventData;
+    }
+
+    if (taskId) {
+      delegation = this.taskCoordinator.getDelegationByRooTask(taskId);
     }
 
     if (!delegation) {
-      // Event not related to a delegation, ignore
+      // Event not related to a delegation, ignore silently
+      // This is expected for tasks that aren't part of a delegation
+      this.logger.debug(`Ignoring ${eventName} event for non-delegated task ${taskId}`);
       return;
     }
 
@@ -272,6 +282,13 @@ export class BytebotAdapter {
   ): void {
     switch (event.type) {
       case 'delegation_completed':
+        // Store the result if present
+        if (event.payload.result) {
+          this.taskCoordinator.setResult(
+            delegation.delegation_id,
+            event.payload.result
+          );
+        }
         this.taskCoordinator.updateStatus(
           delegation.delegation_id,
           DelegationStatus.COMPLETED
@@ -279,6 +296,8 @@ export class BytebotAdapter {
         break;
 
       case 'delegation_error':
+        // Clear any stored completion result on error
+        this.eventNormalizer.clearCompletionResult(delegation.delegation_id);
         this.taskCoordinator.updateStatus(
           delegation.delegation_id,
           DelegationStatus.FAILED,
@@ -300,13 +319,8 @@ export class BytebotAdapter {
    */
   private broadcastDelegationEvent(event: DelegationEvent): void {
     try {
-      // Broadcast as a special delegation event type
-      this.websocketHandler.broadcastEvent('message' as RooCodeEventName, [
-        {
-          type: 'delegation_event',
-          event,
-        },
-      ]);
+      // Use the dedicated delegation event broadcast method
+      this.websocketHandler.broadcastDelegationEvent(event);
       this.logger.debug(`Broadcast delegation event: ${event.type} for ${event.delegation_id}`);
     } catch (error) {
       this.logger.error('Failed to broadcast delegation event:', error);
@@ -320,11 +334,13 @@ export class BytebotAdapter {
     enabled: boolean;
     delegations: any;
     questions: any;
+    eventNormalizer: any;
   } {
     return {
       enabled: this.enabled,
       delegations: this.taskCoordinator.getStats(),
       questions: this.questionHandler.getStats(),
+      eventNormalizer: this.eventNormalizer.getStats(),
     };
   }
 

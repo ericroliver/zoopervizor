@@ -1,4 +1,5 @@
 import { RooCodeEventName } from '../roo-code/types';
+import { DelegationRequest } from '../bytebot/types';
 
 // API Request/Response types
 
@@ -72,13 +73,20 @@ export interface ProfilesResponse {
 
 // WebSocket message types
 export interface WebSocketMessage {
-	type: 'subscribe' | 'unsubscribe' | 'event' | 'subscribed' | 'unsubscribed' | 'error';
+	type: 'delegate_task' | 'subscribe' | 'unsubscribe' | 'event' | 'subscribed' | 'unsubscribed' | 'error' | 'delegation_response';
 	events?: RooCodeEventName[];
 	eventName?: RooCodeEventName;
 	payload?: any;
 	timestamp?: string;
 	taskId?: string;
 	error?: string;
+	// For delegate_task messages
+	delegation?: DelegationRequest;
+	// For delegation_response messages
+	delegation_id?: string;
+	roo_task_id?: string;
+	status?: string;
+	message?: string;
 }
 
 export interface WebSocketClient {

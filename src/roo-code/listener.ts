@@ -16,7 +16,7 @@ export class RooCodeListener {
 
 	async connect(): Promise<boolean> {
 		try {
-			const rooCodeExt = vscode.extensions.getExtension('rooveterinaryinc.roo-code');
+			const rooCodeExt = vscode.extensions.getExtension('rooveterinaryinc.roo-cline');
 
 			if (!rooCodeExt) {
 				this.logger.warn('Roo-Code extension not found');
@@ -119,7 +119,7 @@ export class RooCodeListener {
 
 		// Execution events
 		this.api.on('message', (event: any) => {
-			this.logger.debug(`Message event`, event);
+			this.logger.info(`Message event`, event);
 			this.emitToCallbacks('message', event);
 		});
 
@@ -134,13 +134,13 @@ export class RooCodeListener {
 		});
 
 		this.api.on('taskUserMessage', (taskId: string) => {
-			this.logger.debug(`Task user message: ${taskId}`);
+			this.logger.info(`Task user message: ${taskId}`);
 			this.emitToCallbacks('taskUserMessage', taskId);
 		});
 
 		// Analytics events
 		this.api.on('taskTokenUsageUpdated', (taskId: string, tokenUsage: any) => {
-			this.logger.debug(`Token usage updated: ${taskId}`, tokenUsage);
+			this.logger.info(`Token usage updated: ${taskId}`, tokenUsage);
 			this.emitToCallbacks('taskTokenUsageUpdated', taskId, tokenUsage);
 		});
 
