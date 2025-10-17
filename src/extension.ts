@@ -108,12 +108,46 @@ function setupEventForwarding(): void {
 			if (apiServer && apiServer.isRunning()) {
 				// Extract taskId if it's the first argument and is a string
 				const taskId = typeof args[0] === 'string' ? args[0] : undefined;
+				
+				// Broadcast to WebSocket clients
 				apiServer.getWebSocketHandler().broadcastEvent(eventName, args, taskId);
+				
+				// Forward to BytebotAdapter for delegation handling
+				const bytebotAdapter = apiServer.getBytebotAdapter();
+				if (bytebotAdapter && bytebotAdapter.isEnabled()) {
+					// Construct event data based on event type
+					let eventData: any;
+					
+					if (eventName === 'message' && args.length > 0) {
+						// Message events have the full event object as first arg
+						eventData = args[0];
+					} else if (eventName === 'taskCompleted' && args.length > 0) {
+						// Task completed has taskId as first arg, then additional data
+						eventData = {
+							taskId: args[0],
+							tokenUsage: args[1],
+							toolUsage: args[2],
+							meta: args[3]
+						};
+					} else if (eventName === 'taskToolFailed' && args.length > 0) {
+						// Tool failed has taskId, tool name, and error
+						eventData = {
+							taskId: args[0],
+							tool: args[1],
+							error: args[2]
+						};
+					} else {
+						// For other events, taskId is typically the first argument
+						eventData = typeof args[0] === 'string' ? args[0] : args[0];
+					}
+					
+					bytebotAdapter.handleRooCodeEvent(eventName, eventData);
+				}
 			}
 		});
 	});
 
-	logger.info('Event forwarding to WebSocket clients enabled');
+	logger.info('Event forwarding to WebSocket clients and BytebotAdapter enabled');
 }
 
 function registerCommands(context: vscode.ExtensionContext): void {

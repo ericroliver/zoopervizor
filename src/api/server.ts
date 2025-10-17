@@ -5,11 +5,13 @@ import { RooCodeListener } from '../roo-code/listener';
 import { Logger } from '../logging/logger';
 import { WebSocketHandler } from './websocket';
 import { ApiRoutes } from './routes';
+import { BytebotAdapter } from '../bytebot/bytebot-adapter';
 
 export class ApiServer {
 	private app: Express;
 	private server: Server | null = null;
 	private wsHandler: WebSocketHandler;
+	private bytebotAdapter: BytebotAdapter;
 	private routes: ApiRoutes;
 	private logger: Logger;
 	private port: number;
@@ -23,11 +25,15 @@ export class ApiServer {
 		this.logger = logger;
 		this.port = port;
 		this.app = express();
-		this.wsHandler = new WebSocketHandler(logger);
+		this.wsHandler = new WebSocketHandler(logger, controller);
+		this.bytebotAdapter = new BytebotAdapter(controller, this.wsHandler);
 		this.routes = new ApiRoutes(controller, listener, logger);
 
 		this.setupMiddleware();
 		this.setupRoutes();
+		
+		// Initialize BytebotAdapter (enabled by default)
+		this.bytebotAdapter.initialize(true);
 	}
 
 	private setupMiddleware(): void {
@@ -36,7 +42,7 @@ export class ApiServer {
 
 		// CORS - disabled for localhost only
 		this.app.use((req, res, next) => {
-			res.header('Access-Control-Allow-Origin', 'http://localhost:*');
+			res.header('Access-Control-Allow-Origin', '*');
 			res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 			res.header('Access-Control-Allow-Headers', 'Content-Type');
 			next();
@@ -83,10 +89,13 @@ export class ApiServer {
 
 				// Initialize WebSocket server
 				this.wsHandler.initialize(this.server);
+				
+				// Link BytebotAdapter to WebSocketHandler for delegation handling
+				this.wsHandler.setBytebotAdapter(this.bytebotAdapter);
 
-				this.server.listen(this.port, 'localhost', () => {
-					this.logger.info(`API server started on http://localhost:${this.port}`);
-					this.logger.info(`WebSocket server available at ws://localhost:${this.port}/events`);
+				this.server.listen(this.port, '0.0.0.0', () => {
+					this.logger.info(`API server started on http://0.0.0.0:${this.port} (accessible from all IPs)`);
+					this.logger.info(`WebSocket server available at ws://0.0.0.0:${this.port}/events`);
 					resolve();
 				});
 
@@ -118,6 +127,10 @@ export class ApiServer {
 
 	getWebSocketHandler(): WebSocketHandler {
 		return this.wsHandler;
+	}
+
+	getBytebotAdapter(): BytebotAdapter {
+		return this.bytebotAdapter;
 	}
 
 	isRunning(): boolean {
