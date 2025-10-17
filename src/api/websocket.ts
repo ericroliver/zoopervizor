@@ -99,6 +99,11 @@ export class WebSocketHandler {
 	}
 
 	broadcastEvent(eventName: RooCodeEventName, payload: any[], taskId?: string): void {
+		// TEMP: Only broadcast delegate-related events
+		if (!eventName.includes('delegate')) {
+			return;
+		}
+
 		const message: WebSocketMessage = {
 			type: 'event',
 			eventName,
