@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Bytebot adapter provides an integration layer that allows external agents (like Bytebot) to delegate coding tasks to Roo-Code through Zupervizor. This enables autonomous agents to leverage Roo-Code's capabilities for code generation, modification, and analysis.
+The Bytebot adapter provides an integration layer that allows external agents (like Bytebot) to delegate coding tasks to Roo-Code through Zoopervizor. This enables autonomous agents to leverage Roo-Code's capabilities for code generation, modification, and analysis.
 
 ## Architecture
 
@@ -38,10 +38,10 @@ Enable and configure the Bytebot adapter in VSCode settings:
 
 ```json
 {
-  "zupervizor.bytebot.enabled": true,
-  "zupervizor.bytebot.maxConcurrentDelegations": 3,
-  "zupervizor.bytebot.delegationTimeout": 300000,
-  "zupervizor.bytebot.autoCleanupCompletedAfter": 3600000
+  "zoopervizor.bytebot.enabled": true,
+  "zoopervizor.bytebot.maxConcurrentDelegations": 3,
+  "zoopervizor.bytebot.delegationTimeout": 300000,
+  "zoopervizor.bytebot.autoCleanupCompletedAfter": 3600000
 }
 ```
 
@@ -308,7 +308,7 @@ async function delegateWithRetry(request, maxRetries = 3) {
 
 ### Delegation Not Starting
 - Check if Roo-Code extension is installed and active
-- Verify Zupervizor is connected to Roo-Code (check status bar)
+- Verify Zoopervizor is connected to Roo-Code (check status bar)
 - Ensure `bytebot.enabled` is `true` in settings
 
 ### Events Not Received

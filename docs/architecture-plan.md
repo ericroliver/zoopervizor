@@ -1,8 +1,8 @@
-# Zupervizor - VSCode Extension Architecture Plan
+# Zoopervizor - VSCode Extension Architecture Plan
 
 ## Project Overview
 
-**Name**: Zupervizor  
+**Name**: Zoopervizor  
 **Purpose**: A VSCode extension that monitors Roo-Code activities and exposes an API bridge for external agent communication  
 **MVP Goals**:
 1. Listen to and log all Roo-Code task events
@@ -12,7 +12,7 @@
 ## Project Structure
 
 ```
-zupervizor/
+zoopervizor/
 ├── docs/
 │   ├── roo-code-events-integration-guide.md
 │   ├── architecture-plan.md
@@ -49,7 +49,7 @@ zupervizor/
 
 ```mermaid
 graph TB
-    subgraph "Zupervizor Extension"
+    subgraph "Zoopervizor Extension"
         Ext[Extension Entry Point]
         Listener[RooCodeListener]
         Controller[RooCodeController]
@@ -179,11 +179,11 @@ setConfiguration(values: RooCodeSettings): Promise<void>
 - Provide quick actions via status bar commands
 
 **States**:
-- Idle: `$(check) Zupervizor: Ready`
-- Running: `$(sync~spin) Zupervizor: Task Running`
-- Completed: `$(check) Zupervizor: Task Completed`
-- Error: `$(x) Zupervizor: Error`
-- Not Connected: `$(warning) Zupervizor: Roo-Code Not Found`
+- Idle: `$(check) Zoopervizor: Ready`
+- Running: `$(sync~spin) Zoopervizor: Task Running`
+- Completed: `$(check) Zoopervizor: Task Completed`
+- Error: `$(x) Zoopervizor: Error`
+- Not Connected: `$(warning) Zoopervizor: Roo-Code Not Found`
 
 ### 6. API Server (`src/api/server.ts`)
 
@@ -224,7 +224,7 @@ setConfiguration(values: RooCodeSettings): Promise<void>
 ### REST API
 
 #### GET `/health`
-Check if Zupervizor is running and connected to Roo-Code
+Check if Zoopervizor is running and connected to Roo-Code
 ```json
 {
   "status": "ok",
@@ -304,33 +304,33 @@ Create a new profile
 
 ```json
 {
-  "zupervizor.enabled": {
+  "zoopervizor.enabled": {
     "type": "boolean",
     "default": true,
-    "description": "Enable Zupervizor monitoring"
+    "description": "Enable Zoopervizor monitoring"
   },
-  "zupervizor.api.enabled": {
+  "zoopervizor.api.enabled": {
     "type": "boolean",
     "default": true,
     "description": "Enable API server for external agents"
   },
-  "zupervizor.api.port": {
+  "zoopervizor.api.port": {
     "type": "number",
     "default": 3737,
     "description": "Port for API server"
   },
-  "zupervizor.logging.level": {
+  "zoopervizor.logging.level": {
     "type": "string",
     "enum": ["debug", "info", "warn", "error"],
     "default": "info",
     "description": "Logging level"
   },
-  "zupervizor.logging.showInOutput": {
+  "zoopervizor.logging.showInOutput": {
     "type": "boolean",
     "default": true,
     "description": "Show logs in Output channel"
   },
-  "zupervizor.statusBar.enabled": {
+  "zoopervizor.statusBar.enabled": {
     "type": "boolean",
     "default": true,
     "description": "Show status bar item"

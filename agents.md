@@ -1,23 +1,23 @@
-You are a senior TypeScript developer with extensive experience in VSCode extension development, Node.js, Express, and WebSocket APIs. Zupervizor is a VSCode extension that monitors Roo-Code activities and provides an API bridge for external agent communication.
+You are a senior TypeScript developer with extensive experience in VSCode extension development, Node.js, Express, and WebSocket APIs. Zoopervizor is a VSCode extension that monitors Roo-Code activities and provides an API bridge for external agent communication.
 
 # Project Overview
 
-Zupervizor is a VSCode extension that monitors and controls Roo-Code AI coding assistant activities. It provides:
+Zoopervizor is a VSCode extension that monitors and controls Roo-Code AI coding assistant activities. It provides:
 - Real-time event monitoring of Roo-Code task lifecycle
 - Visual feedback via VSCode status bar
 - HTTP REST API and WebSocket server for external agent integration
 - Comprehensive logging and debugging capabilities
 - Programmatic control of Roo-Code tasks
 
-**Repository**: https://github.com/[your-org]/zupervizor  
-**Extension Name**: Zupervizor  
-**Extension ID**: zupervizor
+**Repository**: https://github.com/[your-org]/zoopervizor  
+**Extension Name**: Zoopervizor  
+**Extension ID**: zoopervizor
 
 # Architecture Components
 
 ```
 ┌───────────────────────────────────────────────────────────┐
-│                    Zupervizor Extension                   │
+│                    Zoopervizor Extension                   │
 ├───────────────────────────────────────────────────────────┤
 │                                                            │
 │  ┌──────────────────┐        ┌─────────────────────┐    │
@@ -80,7 +80,7 @@ Zupervizor is a VSCode extension that monitors and controls Roo-Code AI coding a
 # Project Structure
 
 ```
-zupervizor/
+zoopervizor/
 ├── src/
 │   ├── extension.ts              # Extension activation & lifecycle
 │   ├── roo-code/
@@ -147,12 +147,12 @@ npm run lint
 1. Open project in VSCode
 2. Press `F5` to launch Extension Development Host
 3. The extension will be active in the new window
-4. View logs: `Ctrl+Shift+P` → "Zupervizor: Show Output"
+4. View logs: `Ctrl+Shift+P` → "Zoopervizor: Show Output"
 
 ### Installing from VSIX
 ```bash
 # After running npm run package
-code --install-extension zupervizor-0.1.0.vsix
+code --install-extension zoopervizor-0.1.0.vsix
 ```
 
 ## Testing the API
@@ -203,12 +203,12 @@ Configure via VSCode Settings (File → Preferences → Settings):
 
 ```json
 {
-  "zupervizor.enabled": true,
-  "zupervizor.api.enabled": true,
-  "zupervizor.api.port": 3737,
-  "zupervizor.logging.level": "info",
-  "zupervizor.logging.showInOutput": true,
-  "zupervizor.statusBar.enabled": true
+  "zoopervizor.enabled": true,
+  "zoopervizor.api.enabled": true,
+  "zoopervizor.api.port": 3737,
+  "zoopervizor.logging.level": "info",
+  "zoopervizor.logging.showInOutput": true,
+  "zoopervizor.statusBar.enabled": true
 }
 ```
 
@@ -258,7 +258,7 @@ Before marking work complete:
 
 ### Manual Testing Workflow
 1. Press `F5` to launch Extension Development Host
-2. Open Output channel: `Ctrl+Shift+P` → "Zupervizor: Show Output"
+2. Open Output channel: `Ctrl+Shift+P` → "Zoopervizor: Show Output"
 3. Verify status bar shows correct state
 4. Test API endpoints using curl/Postman
 5. Test WebSocket using wscat or browser
@@ -405,7 +405,7 @@ See [`docs/api-documentation.md`](docs/api-documentation.md) for complete API re
 
 ## Roo-Code API Integration
 
-Zupervizor integrates with Roo-Code through its extension API:
+Zoopervizor integrates with Roo-Code through its extension API:
 
 **Listener Pattern**: [`RooCodeListener`](src/roo-code/listener.ts) connects to Roo-Code's event emitter and forwards events to:
 - Logger for recording
@@ -459,12 +459,12 @@ External agents (like Bytebot) can integrate via:
 Enable debug logging:
 ```json
 {
-  "zupervizor.logging.level": "debug"
+  "zoopervizor.logging.level": "debug"
 }
 ```
 
 View logs:
-1. `Ctrl+Shift+P` → "Zupervizor: Show Output"
+1. `Ctrl+Shift+P` → "Zoopervizor: Show Output"
 2. Check VSCode Developer Tools console
 3. View API server console output
 

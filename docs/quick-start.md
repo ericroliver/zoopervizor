@@ -1,4 +1,4 @@
-# Zupervizor - Quick Start Guide
+# Zoopervizor - Quick Start Guide
 
 ## For Users
 
@@ -6,22 +6,22 @@
 
 1. **Install from VSIX** (when available):
    ```
-   Extensions → ... → Install from VSIX → Select zupervizor-0.1.0.vsix
+   Extensions → ... → Install from VSIX → Select zoopervizor-0.1.0.vsix
    ```
 
 2. **Verify Installation**:
-   - Look for "Zupervizor" in the status bar (bottom right)
-   - Open Output panel (View → Output) and select "Zupervizor" from dropdown
+   - Look for "Zoopervizor" in the status bar (bottom right)
+   - Open Output panel (View → Output) and select "Zoopervizor" from dropdown
 
 ### Basic Usage
 
 1. **Start Monitoring**:
-   - Zupervizor automatically starts when VSCode opens
+   - Zoopervizor automatically starts when VSCode opens
    - Status bar shows connection status
 
 2. **View Logs**:
    - Click status bar item, or
-   - Run command: `Zupervizor: Show Output`
+   - Run command: `Zoopervizor: Show Output`
 
 3. **Use External API**:
    ```bash
@@ -42,11 +42,11 @@
 
 ### Configuration
 
-Open VSCode Settings (Ctrl+,) and search for "Zupervizor":
+Open VSCode Settings (Ctrl+,) and search for "Zoopervizor":
 
-- **Enable/Disable**: `zupervizor.enabled`
-- **API Port**: `zupervizor.api.port` (default: 3737)
-- **Log Level**: `zupervizor.logging.level` (debug/info/warn/error)
+- **Enable/Disable**: `zoopervizor.enabled`
+- **API Port**: `zoopervizor.api.port` (default: 3737)
+- **Log Level**: `zoopervizor.logging.level` (debug/info/warn/error)
 
 ---
 
@@ -57,7 +57,7 @@ Open VSCode Settings (Ctrl+,) and search for "Zupervizor":
 1. **Clone and Install**:
    ```bash
    git clone <repository-url>
-   cd zupervizor
+   cd zoopervizor
    npm install
    ```
 
@@ -260,7 +260,7 @@ Expected response:
 ### View Logs
 
 1. Open Output panel: View → Output
-2. Select "Zupervizor" from dropdown
+2. Select "Zoopervizor" from dropdown
 3. Check for errors or warnings
 
 ### Reset Extension

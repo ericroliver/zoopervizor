@@ -1,9 +1,9 @@
 {
-  "name": "zupervizor",
-  "displayName": "Zupervizor",
+  "name": "zoopervizor",
+  "displayName": "Zoopervizor",
   "description": "Monitor and control Roo-Code activities with external API bridge",
   "version": "0.1.0",
-  "publisher": "zupervizor",
+  "publisher": "zoopervizor",
   "engines": {
     "vscode": "^1.85.0"
   },
@@ -17,37 +17,37 @@
   "contributes": {
     "commands": [
       {
-        "command": "zupervizor.showOutput",
-        "title": "Zupervizor: Show Output"
+        "command": "zoopervizor.showOutput",
+        "title": "Zoopervizor: Show Output"
       },
       {
-        "command": "zupervizor.toggleStatusBar",
-        "title": "Zupervizor: Toggle Status Bar"
+        "command": "zoopervizor.toggleStatusBar",
+        "title": "Zoopervizor: Toggle Status Bar"
       },
       {
-        "command": "zupervizor.restartServer",
-        "title": "Zupervizor: Restart API Server"
+        "command": "zoopervizor.restartServer",
+        "title": "Zoopervizor: Restart API Server"
       }
     ],
     "configuration": {
-      "title": "Zupervizor",
+      "title": "Zoopervizor",
       "properties": {
-        "zupervizor.enabled": {
+        "zoopervizor.enabled": {
           "type": "boolean",
           "default": true,
-          "description": "Enable Zupervizor monitoring"
+          "description": "Enable Zoopervizor monitoring"
         },
-        "zupervizor.api.enabled": {
+        "zoopervizor.api.enabled": {
           "type": "boolean",
           "default": true,
           "description": "Enable API server for external agents"
         },
-        "zupervizor.api.port": {
+        "zoopervizor.api.port": {
           "type": "number",
           "default": 3737,
           "description": "Port for API server"
         },
-        "zupervizor.logging.level": {
+        "zoopervizor.logging.level": {
           "type": "string",
           "enum": [
             "debug",
@@ -58,32 +58,32 @@
           "default": "info",
           "description": "Logging level"
         },
-        "zupervizor.logging.showInOutput": {
+        "zoopervizor.logging.showInOutput": {
           "type": "boolean",
           "default": true,
           "description": "Show logs in Output channel"
         },
-        "zupervizor.statusBar.enabled": {
+        "zoopervizor.statusBar.enabled": {
           "type": "boolean",
           "default": true,
           "description": "Show status bar item"
         },
-        "zupervizor.bytebot.enabled": {
+        "zoopervizor.bytebot.enabled": {
           "type": "boolean",
           "default": true,
           "description": "Enable Bytebot adapter integration"
         },
-        "zupervizor.bytebot.maxConcurrentDelegations": {
+        "zoopervizor.bytebot.maxConcurrentDelegations": {
           "type": "number",
           "default": 3,
           "description": "Maximum number of concurrent delegations"
         },
-        "zupervizor.bytebot.delegationTimeout": {
+        "zoopervizor.bytebot.delegationTimeout": {
           "type": "number",
           "default": 300000,
           "description": "Delegation timeout in milliseconds (default: 5 minutes)"
         },
-        "zupervizor.bytebot.autoCleanupCompletedAfter": {
+        "zoopervizor.bytebot.autoCleanupCompletedAfter": {
           "type": "number",
           "default": 3600000,
           "description": "Auto-cleanup completed delegations after milliseconds (default: 1 hour)"

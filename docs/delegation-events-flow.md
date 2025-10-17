@@ -1,6 +1,6 @@
 # Delegation Events Flow
 
-This document describes how delegation events flow from Bytebot through Zupervizor and back to the WebSocket client.
+This document describes how delegation events flow from Bytebot through Zoopervizor and back to the WebSocket client.
 
 ## Architecture Overview
 
@@ -28,7 +28,7 @@ Bytebot Client (receives DelegationEvent)
 
 ## Event Flow Details
 
-### 1. Delegation Request (Bytebot → Zupervizor)
+### 1. Delegation Request (Bytebot → Zoopervizor)
 
 When Bytebot wants to delegate a task, it sends a WebSocket message:
 
@@ -70,7 +70,7 @@ The `BytebotAdapter` receives these Roo-Code events and:
 2. Passes the event to `EventNormalizer.normalize()`
 3. Transforms Roo-Code events into `DelegationEvent` format
 
-### 5. Delegation Events (Zupervizor → Bytebot)
+### 5. Delegation Events (Zoopervizor → Bytebot)
 
 The normalized events are broadcast back to WebSocket clients:
 
@@ -161,7 +161,7 @@ Delegation events are sent to WebSocket clients in this format:
    }
    ```
 
-2. **Zupervizor creates Roo task and responds:**
+2. **Zoopervizor creates Roo task and responds:**
    ```json
    {
      "type": "delegation_response",
@@ -171,7 +171,7 @@ Delegation events are sent to WebSocket clients in this format:
    }
    ```
 
-3. **Roo-Code emits events, Zupervizor forwards as delegation events:**
+3. **Roo-Code emits events, Zoopervizor forwards as delegation events:**
    ```json
    {
      "type": "event",

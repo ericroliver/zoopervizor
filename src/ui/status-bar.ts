@@ -11,7 +11,7 @@ export class StatusBarManager {
 			vscode.StatusBarAlignment.Right,
 			100
 		);
-		this.statusBarItem.command = 'zupervizor.showOutput';
+		this.statusBarItem.command = 'zoopervizor.showOutput';
 		this.updateDisplay();
 	}
 
@@ -41,7 +41,7 @@ export class StatusBarManager {
 		const message = messages[this.currentState];
 		const detailsStr = details ? ` - ${details}` : '';
 
-		this.statusBarItem.text = `${icon} Zupervizor: ${message}${detailsStr}`;
+		this.statusBarItem.text = `${icon} Zoopervizor: ${message}${detailsStr}`;
 		this.statusBarItem.show();
 	}
 
