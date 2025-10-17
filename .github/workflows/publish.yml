@@ -1,0 +1,71 @@
+name: Publish Extension
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Lint
+      run: npm run lint
+
+    - name: Compile TypeScript
+      run: npm run compile
+
+    - name: Run security audit
+      run: npm audit --production --audit-level=high
+
+    - name: Package extension
+      run: npm run package
+
+    - name: Get version from tag
+      id: version
+      run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+    - name: Verify version matches package.json
+      run: |
+        PACKAGE_VERSION=$(node -p "require('./package.json').version")
+        if [ "${{ steps.version.outputs.VERSION }}" != "$PACKAGE_VERSION" ]; then
+          echo "Error: Tag version (${{ steps.version.outputs.VERSION }}) does not match package.json version ($PACKAGE_VERSION)"
+          exit 1
+        fi
+
+    - name: Publish to VS Code Marketplace
+      if: success() && !contains(github.ref, 'beta') && !contains(github.ref, 'alpha')
+      run: npx @vscode/vsce publish -p ${{ secrets.VSCE_PAT }}
+
+    - name: Publish as Pre-Release
+      if: success() && (contains(github.ref, 'beta') || contains(github.ref, 'alpha'))
+      run: npx @vscode/vsce publish --pre-release -p ${{ secrets.VSCE_PAT }}
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: '*.vsix'
+        generate_release_notes: true
+        draft: false
+        prerelease: ${{ contains(github.ref, 'beta') || contains(github.ref, 'alpha') }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Upload VSIX to release
+      uses: actions/upload-artifact@v4
+      with:
+        name: vsix-release-${{ steps.version.outputs.VERSION }}
+        path: '*.vsix'
+        retention-days: 90

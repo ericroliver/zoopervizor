@@ -1,0 +1,85 @@
+name: Release Preparation
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., 0.2.0)'
+        required: true
+        type: string
+      release_type:
+        description: 'Release type'
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+jobs:
+  prepare-release:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+
+    - name: Configure Git
+      run: |
+        git config user.name "GitHub Actions"
+        git config user.email "actions@github.com"
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Update version in package.json
+      run: npm version ${{ github.event.inputs.version }} --no-git-tag-version
+
+    - name: Build and test
+      run: |
+        npm run compile
+        npm run lint
+
+    - name: Package extension
+      run: npm run package
+
+    - name: Create release branch
+      run: |
+        BRANCH_NAME="release/v${{ github.event.inputs.version }}"
+        git checkout -b $BRANCH_NAME
+        git add package.json package-lock.json
+        git commit -m "chore: bump version to ${{ github.event.inputs.version }}"
+        git push origin $BRANCH_NAME
+
+    - name: Create Pull Request
+      uses: peter-evans/create-pull-request@v5
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        branch: release/v${{ github.event.inputs.version }}
+        title: "Release v${{ github.event.inputs.version }}"
+        body: |
+          ## Release v${{ github.event.inputs.version }}
+          
+          This PR prepares the release for version ${{ github.event.inputs.version }}.
+          
+          ### Checklist
+          - [ ] CHANGELOG.md updated
+          - [ ] README.md updated (if needed)
+          - [ ] All tests passing
+          - [ ] Security audit clean
+          - [ ] Documentation updated
+          
+          ### Next Steps
+          After merging this PR:
+          1. Create and push a git tag: `git tag v${{ github.event.inputs.version }} && git push origin v${{ github.event.inputs.version }}`
+          2. The publish workflow will automatically run
+          3. Extension will be published to VS Code Marketplace
+          4. GitHub release will be created
+        labels: release

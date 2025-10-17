@@ -95,8 +95,20 @@
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
+    "build": "npm run compile",
+    "clean": "rm -rf out *.vsix",
+    "prebuild": "npm run clean",
+    "prepackage": "npm run build",
     "package": "vsce package",
-    "lint": "eslint src --ext ts"
+    "package:pre-release": "vsce package --pre-release",
+    "publish": "vsce publish",
+    "publish:pre-release": "vsce publish --pre-release",
+    "lint": "eslint src --ext ts",
+    "lint:fix": "eslint src --ext ts --fix",
+    "audit:check": "npm audit --production",
+    "audit:fix": "npm audit fix",
+    "check": "npm run lint && npm run compile && npm run audit:check",
+    "vsce:ls": "vsce ls"
   },
   "dependencies": {
     "express": "^4.18.2",
