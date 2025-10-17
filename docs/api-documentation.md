@@ -1,8 +1,8 @@
-# Zupervizor API Documentation
+# Zoopervizor API Documentation
 
 ## Overview
 
-Zupervizor exposes both REST API and WebSocket API for external agents to monitor and control Roo-Code activities.
+Zoopervizor exposes both REST API and WebSocket API for external agents to monitor and control Roo-Code activities.
 
 **Base URL**: `http://localhost:3737` (configurable via settings)
 
@@ -16,7 +16,7 @@ Currently, no authentication is required (MVP). The API server binds to localhos
 
 ### Health Check
 
-Check if Zupervizor is running and connected to Roo-Code.
+Check if Zoopervizor is running and connected to Roo-Code.
 
 **Endpoint**: `GET /health`
 
@@ -375,7 +375,7 @@ Connect to the WebSocket server for real-time event streaming.
 const ws = new WebSocket('ws://localhost:3737/events');
 
 ws.onopen = () => {
-  console.log('Connected to Zupervizor');
+  console.log('Connected to Zoopervizor');
 };
 
 ws.onmessage = (event) => {
@@ -388,7 +388,7 @@ ws.onerror = (error) => {
 };
 
 ws.onclose = () => {
-  console.log('Disconnected from Zupervizor');
+  console.log('Disconnected from Zoopervizor');
 };
 ```
 
@@ -409,7 +409,7 @@ def on_close(ws, close_status_code, close_msg):
     print("Connection closed")
 
 def on_open(ws):
-    print("Connected to Zupervizor")
+    print("Connected to Zoopervizor")
     # Subscribe to specific events
     ws.send(json.dumps({
         "type": "subscribe",
@@ -678,7 +678,7 @@ const WS_URL = 'ws://localhost:3737/events';
 const ws = new WebSocket(WS_URL);
 
 ws.on('open', () => {
-  console.log('Connected to Zupervizor');
+  console.log('Connected to Zoopervizor');
   
   // Subscribe to events
   ws.send(JSON.stringify({
@@ -754,7 +754,7 @@ import time
 API_BASE = 'http://localhost:3737'
 WS_URL = 'ws://localhost:3737/events'
 
-class ZupervizorClient:
+class ZoopervizorClient:
     def __init__(self):
         self.ws = None
         self.connected = False
@@ -769,7 +769,7 @@ class ZupervizorClient:
                 print(f"Task {task_id} completed with {token_usage['totalTokens']} tokens")
         
         def on_open(ws):
-            print("Connected to Zupervizor")
+            print("Connected to Zoopervizor")
             self.connected = True
             # Subscribe to events
             ws.send(json.dumps({
@@ -813,7 +813,7 @@ class ZupervizorClient:
         response.raise_for_status()
 
 # Usage
-client = ZupervizorClient()
+client = ZoopervizorClient()
 client.connect_websocket()
 
 # Start a task

@@ -1,8 +1,8 @@
-# Zupervizor - Implementation Guide
+# Zoopervizor - Implementation Guide
 
 ## Overview
 
-This guide provides detailed implementation instructions for each component of the Zupervizor extension. Follow these steps in order to build the MVP.
+This guide provides detailed implementation instructions for each component of the Zoopervizor extension. Follow these steps in order to build the MVP.
 
 ## Prerequisites
 
@@ -76,8 +76,8 @@ Update `package.json` with extension metadata:
 
 ```json
 {
-  "name": "zupervizor",
-  "displayName": "Zupervizor",
+  "name": "zoopervizor",
+  "displayName": "Zoopervizor",
   "description": "Monitor and control Roo-Code activities with external API bridge",
   "version": "0.1.0",
   "publisher": "your-publisher-name",
@@ -94,48 +94,48 @@ Update `package.json` with extension metadata:
   "contributes": {
     "commands": [
       {
-        "command": "zupervizor.showOutput",
-        "title": "Zupervizor: Show Output"
+        "command": "zoopervizor.showOutput",
+        "title": "Zoopervizor: Show Output"
       },
       {
-        "command": "zupervizor.toggleStatusBar",
-        "title": "Zupervizor: Toggle Status Bar"
+        "command": "zoopervizor.toggleStatusBar",
+        "title": "Zoopervizor: Toggle Status Bar"
       },
       {
-        "command": "zupervizor.restartServer",
-        "title": "Zupervizor: Restart API Server"
+        "command": "zoopervizor.restartServer",
+        "title": "Zoopervizor: Restart API Server"
       }
     ],
     "configuration": {
-      "title": "Zupervizor",
+      "title": "Zoopervizor",
       "properties": {
-        "zupervizor.enabled": {
+        "zoopervizor.enabled": {
           "type": "boolean",
           "default": true,
-          "description": "Enable Zupervizor monitoring"
+          "description": "Enable Zoopervizor monitoring"
         },
-        "zupervizor.api.enabled": {
+        "zoopervizor.api.enabled": {
           "type": "boolean",
           "default": true,
           "description": "Enable API server for external agents"
         },
-        "zupervizor.api.port": {
+        "zoopervizor.api.port": {
           "type": "number",
           "default": 3737,
           "description": "Port for API server"
         },
-        "zupervizor.logging.level": {
+        "zoopervizor.logging.level": {
           "type": "string",
           "enum": ["debug", "info", "warn", "error"],
           "default": "info",
           "description": "Logging level"
         },
-        "zupervizor.logging.showInOutput": {
+        "zoopervizor.logging.showInOutput": {
           "type": "boolean",
           "default": true,
           "description": "Show logs in Output channel"
         },
-        "zupervizor.statusBar.enabled": {
+        "zoopervizor.statusBar.enabled": {
           "type": "boolean",
           "default": true,
           "description": "Show status bar item"
@@ -276,7 +276,7 @@ Create `src/config/settings.ts`:
 ```typescript
 import * as vscode from 'vscode';
 
-export interface ZupervizorConfig {
+export interface ZoopervizorConfig {
   enabled: boolean;
   api: {
     enabled: boolean;
@@ -292,9 +292,9 @@ export interface ZupervizorConfig {
 }
 
 export class ConfigurationManager {
-  private static readonly CONFIG_SECTION = 'zupervizor';
+  private static readonly CONFIG_SECTION = 'zoopervizor';
 
-  static getConfig(): ZupervizorConfig {
+  static getConfig(): ZoopervizorConfig {
     const config = vscode.workspace.getConfiguration(this.CONFIG_SECTION);
     
     return {
@@ -313,7 +313,7 @@ export class ConfigurationManager {
     };
   }
 
-  static onConfigChange(callback: (config: ZupervizorConfig) => void): vscode.Disposable {
+  static onConfigChange(callback: (config: ZoopervizorConfig) => void): vscode.Disposable {
     return vscode.workspace.onDidChangeConfiguration((e) => {
       if (e.affectsConfiguration(this.CONFIG_SECTION)) {
         callback(this.getConfig());
@@ -415,7 +415,7 @@ export class StatusBarManager {
       vscode.StatusBarAlignment.Right,
       100
     );
-    this.statusBarItem.command = 'zupervizor.showOutput';
+    this.statusBarItem.command = 'zoopervizor.showOutput';
     this.updateDisplay();
   }
 
@@ -445,7 +445,7 @@ export class StatusBarManager {
     const message = messages[this.currentState];
     const detailsStr = details ? ` - ${details}` : '';
 
-    this.statusBarItem.text = `${icon} Zupervizor: ${message}${detailsStr}`;
+    this.statusBarItem.text = `${icon} Zoopervizor: ${message}${detailsStr}`;
     this.statusBarItem.show();
   }
 
@@ -754,7 +754,7 @@ export class RooCodeController {
 }
 ```
 
-This implementation guide provides the foundation for the Zupervizor extension. The next steps would be to implement the API server and WebSocket handler, followed by the main extension entry point.
+This implementation guide provides the foundation for the Zoopervizor extension. The next steps would be to implement the API server and WebSocket handler, followed by the main extension entry point.
 
 ## Next Steps
 

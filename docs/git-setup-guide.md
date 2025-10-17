@@ -2,7 +2,7 @@
 
 ## Overview
 
-This guide provides all the necessary configuration files for setting up the git repository for the Zupervizor project.
+This guide provides all the necessary configuration files for setting up the git repository for the Zoopervizor project.
 
 ## Step 1: Initialize Git Repository
 
@@ -98,7 +98,7 @@ Create a `.gitattributes` file in the project root:
 Create a `README.md` file in the project root:
 
 ```markdown
-# Zupervizor
+# Zoopervizor
 
 A VSCode extension that monitors Roo-Code activities and provides an API bridge for external agent communication.
 
@@ -117,7 +117,7 @@ A VSCode extension that monitors Roo-Code activities and provides an API bridge 
 1. Clone the repository:
    ```bash
    git clone <repository-url>
-   cd zupervizor
+   cd zoopervizor
    ```
 
 2. Install dependencies:
@@ -147,16 +147,16 @@ A VSCode extension that monitors Roo-Code activities and provides an API bridge 
 
 ## Configuration
 
-Configure Zupervizor through VSCode settings:
+Configure Zoopervizor through VSCode settings:
 
 ```json
 {
-  "zupervizor.enabled": true,
-  "zupervizor.api.enabled": true,
-  "zupervizor.api.port": 3737,
-  "zupervizor.logging.level": "info",
-  "zupervizor.logging.showInOutput": true,
-  "zupervizor.statusBar.enabled": true
+  "zoopervizor.enabled": true,
+  "zoopervizor.api.enabled": true,
+  "zoopervizor.api.port": 3737,
+  "zoopervizor.logging.level": "info",
+  "zoopervizor.logging.showInOutput": true,
+  "zoopervizor.statusBar.enabled": true
 }
 ```
 
@@ -164,12 +164,12 @@ Configure Zupervizor through VSCode settings:
 
 | Setting | Type | Default | Description |
 |---------|------|---------|-------------|
-| `zupervizor.enabled` | boolean | `true` | Enable/disable Zupervizor monitoring |
-| `zupervizor.api.enabled` | boolean | `true` | Enable/disable API server |
-| `zupervizor.api.port` | number | `3737` | Port for API server |
-| `zupervizor.logging.level` | string | `"info"` | Logging level (debug, info, warn, error) |
-| `zupervizor.logging.showInOutput` | boolean | `true` | Show logs in Output channel |
-| `zupervizor.statusBar.enabled` | boolean | `true` | Show status bar item |
+| `zoopervizor.enabled` | boolean | `true` | Enable/disable Zoopervizor monitoring |
+| `zoopervizor.api.enabled` | boolean | `true` | Enable/disable API server |
+| `zoopervizor.api.port` | number | `3737` | Port for API server |
+| `zoopervizor.logging.level` | string | `"info"` | Logging level (debug, info, warn, error) |
+| `zoopervizor.logging.showInOutput` | boolean | `true` | Show logs in Output channel |
+| `zoopervizor.statusBar.enabled` | boolean | `true` | Show status bar item |
 
 ## API Documentation
 
@@ -243,9 +243,9 @@ ws.send(JSON.stringify({
 
 ## Commands
 
-- `Zupervizor: Show Output` - Open the Zupervizor output channel
-- `Zupervizor: Toggle Status Bar` - Show/hide the status bar item
-- `Zupervizor: Restart API Server` - Restart the API server
+- `Zoopervizor: Show Output` - Open the Zoopervizor output channel
+- `Zoopervizor: Toggle Status Bar` - Show/hide the status bar item
+- `Zoopervizor: Restart API Server` - Restart the API server
 
 ## Development
 
@@ -276,7 +276,7 @@ This creates a `.vsix` file that can be installed in VSCode.
 
 ## Architecture
 
-Zupervizor consists of several key components:
+Zoopervizor consists of several key components:
 
 - **RooCodeListener**: Connects to Roo-Code API and listens to events
 - **RooCodeController**: Provides methods to control Roo-Code
@@ -308,8 +308,8 @@ If the API server fails to start:
 
 If events aren't appearing in the Output channel:
 
-1. Check that `zupervizor.enabled` is `true`
-2. Verify `zupervizor.logging.showInOutput` is `true`
+1. Check that `zoopervizor.enabled` is `true`
+2. Verify `zoopervizor.logging.showInOutput` is `true`
 3. Check the logging level setting
 4. Ensure Roo-Code is actually running tasks
 
@@ -363,7 +363,7 @@ After creating all the files, make your initial commit:
 git add .
 
 # Create initial commit
-git commit -m "Initial commit: Zupervizor VSCode extension boilerplate
+git commit -m "Initial commit: Zoopervizor VSCode extension boilerplate
 
 - Add project documentation (architecture, implementation guide)
 - Add git configuration (.gitignore, .gitattributes)

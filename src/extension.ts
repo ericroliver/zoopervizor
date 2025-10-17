@@ -4,7 +4,7 @@ import { StatusBarManager } from './ui/status-bar';
 import { RooCodeListener } from './roo-code/listener';
 import { RooCodeController } from './roo-code/controller';
 import { ApiServer } from './api/server';
-import { ConfigurationManager, ZupervizorConfig } from './config/settings';
+import { ConfigurationManager, ZoopervizorConfig } from './config/settings';
 import { RooCodeEventName } from './roo-code/types';
 
 let logger: Logger;
@@ -12,17 +12,17 @@ let statusBar: StatusBarManager;
 let listener: RooCodeListener;
 let controller: RooCodeController;
 let apiServer: ApiServer;
-let config: ZupervizorConfig;
+let config: ZoopervizorConfig;
 
 export async function activate(context: vscode.ExtensionContext) {
-	console.log('Zupervizor is activating...');
+	console.log('Zoopervizor is activating...');
 
 	// Get configuration
 	config = ConfigurationManager.getConfig();
 
 	// Initialize logger
-	logger = new Logger('Zupervizor', config.logging.level);
-	logger.info('Zupervizor extension activating...');
+	logger = new Logger('Zoopervizor', config.logging.level);
+	logger.info('Zoopervizor extension activating...');
 
 	// Initialize status bar
 	statusBar = new StatusBarManager();
@@ -43,7 +43,7 @@ export async function activate(context: vscode.ExtensionContext) {
 		} else {
 			logger.warn('Failed to connect to Roo-Code. Will retry when Roo-Code becomes available.');
 			vscode.window.showWarningMessage(
-				'Zupervizor: Roo-Code extension not found. Please install Roo-Code to enable monitoring.'
+				'Zoopervizor: Roo-Code extension not found. Please install Roo-Code to enable monitoring.'
 			);
 		}
 	}
@@ -56,7 +56,7 @@ export async function activate(context: vscode.ExtensionContext) {
 		} catch (error) {
 			logger.error('Failed to start API server', error);
 			vscode.window.showErrorMessage(
-				`Zupervizor: Failed to start API server on port ${config.api.port}. ${error instanceof Error ? error.message : 'Unknown error'}`
+				`Zoopervizor: Failed to start API server on port ${config.api.port}. ${error instanceof Error ? error.message : 'Unknown error'}`
 			);
 		}
 	}
@@ -73,8 +73,8 @@ export async function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(logger);
 	context.subscriptions.push(statusBar);
 
-	logger.info('Zupervizor extension activated successfully');
-	console.log('Zupervizor is now active!');
+	logger.info('Zoopervizor extension activated successfully');
+	console.log('Zoopervizor is now active!');
 }
 
 function setupEventForwarding(): void {
@@ -153,18 +153,18 @@ function setupEventForwarding(): void {
 function registerCommands(context: vscode.ExtensionContext): void {
 	// Show output command
 	context.subscriptions.push(
-		vscode.commands.registerCommand('zupervizor.showOutput', () => {
+		vscode.commands.registerCommand('zoopervizor.showOutput', () => {
 			logger.show();
 		})
 	);
 
 	// Toggle status bar command
 	context.subscriptions.push(
-		vscode.commands.registerCommand('zupervizor.toggleStatusBar', () => {
+		vscode.commands.registerCommand('zoopervizor.toggleStatusBar', () => {
 			if (statusBar) {
 				const currentConfig = ConfigurationManager.getConfig();
 				const newValue = !currentConfig.statusBar.enabled;
-				vscode.workspace.getConfiguration('zupervizor').update(
+				vscode.workspace.getConfiguration('zoopervizor').update(
 					'statusBar.enabled',
 					newValue,
 					vscode.ConfigurationTarget.Global
@@ -175,17 +175,17 @@ function registerCommands(context: vscode.ExtensionContext): void {
 
 	// Restart server command
 	context.subscriptions.push(
-		vscode.commands.registerCommand('zupervizor.restartServer', async () => {
+		vscode.commands.registerCommand('zoopervizor.restartServer', async () => {
 			if (apiServer) {
 				logger.info('Restarting API server...');
 				apiServer.stop();
 				try {
 					await apiServer.start();
-					vscode.window.showInformationMessage('Zupervizor: API server restarted successfully');
+					vscode.window.showInformationMessage('Zoopervizor: API server restarted successfully');
 				} catch (error) {
 					logger.error('Failed to restart API server', error);
 					vscode.window.showErrorMessage(
-						`Zupervizor: Failed to restart API server. ${error instanceof Error ? error.message : 'Unknown error'}`
+						`Zoopervizor: Failed to restart API server. ${error instanceof Error ? error.message : 'Unknown error'}`
 					);
 				}
 			}
@@ -195,7 +195,7 @@ function registerCommands(context: vscode.ExtensionContext): void {
 	logger.info('Commands registered');
 }
 
-async function handleConfigChange(newConfig: ZupervizorConfig): Promise<void> {
+async function handleConfigChange(newConfig: ZoopervizorConfig): Promise<void> {
 	logger.info('Configuration changed', newConfig);
 
 	// Update logger level
@@ -223,7 +223,7 @@ async function handleConfigChange(newConfig: ZupervizorConfig): Promise<void> {
 			} catch (error) {
 				logger.error('Failed to restart API server with new port', error);
 				vscode.window.showErrorMessage(
-					`Zupervizor: Failed to restart API server on port ${newConfig.api.port}`
+					`Zoopervizor: Failed to restart API server on port ${newConfig.api.port}`
 				);
 			}
 		}
@@ -263,7 +263,7 @@ async function handleConfigChange(newConfig: ZupervizorConfig): Promise<void> {
 }
 
 export function deactivate() {
-	logger?.info('Zupervizor extension deactivating...');
+	logger?.info('Zoopervizor extension deactivating...');
 
 	// Stop API server
 	if (apiServer) {
@@ -275,6 +275,6 @@ export function deactivate() {
 		listener.disconnect();
 	}
 
-	logger?.info('Zupervizor extension deactivated');
-	console.log('Zupervizor has been deactivated');
+	logger?.info('Zoopervizor extension deactivated');
+	console.log('Zoopervizor has been deactivated');
 }

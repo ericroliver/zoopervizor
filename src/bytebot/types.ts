@@ -1,5 +1,5 @@
 /**
- * Bytebot integration types for Zupervizor
+ * Bytebot integration types for Zoopervizor
  */
 
 import { RooCodeEventName, ClineMessage, TokenUsage } from '../roo-code/types';

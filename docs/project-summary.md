@@ -1,14 +1,14 @@
-# Zupervizor - Project Summary
+# Zoopervizor - Project Summary
 
 ## Project Overview
 
-**Name**: Zupervizor  
+**Name**: Zoopervizor  
 **Type**: VSCode Extension  
 **Purpose**: Monitor Roo-Code activities and provide an API bridge for external agent communication
 
 ## Vision
 
-Zupervizor is designed to be a comprehensive monitoring and control system for Roo-Code, with the long-term vision of supporting multiple AI coding assistants. The name "Zupervizor" (supervisor) reflects its role as an oversight system that can coordinate and manage various AI agents.
+Zoopervizor is designed to be a comprehensive monitoring and control system for Roo-Code, with the long-term vision of supporting multiple AI coding assistants. The name "Zoopervizor" (supervisor) reflects its role as an oversight system that can coordinate and manage various AI agents.
 
 ## MVP Goals
 
@@ -116,7 +116,7 @@ Channel  UI      Agents
 ## Project Structure
 
 ```
-zupervizor/
+zoopervizor/
 ├── docs/                                    # Documentation
 │   ├── roo-code-events-integration-guide.md # Research and integration guide
 │   ├── architecture-plan.md                 # Detailed architecture
@@ -243,12 +243,12 @@ zupervizor/
 
 ```json
 {
-  "zupervizor.enabled": true,
-  "zupervizor.api.enabled": true,
-  "zupervizor.api.port": 3737,
-  "zupervizor.logging.level": "info",
-  "zupervizor.logging.showInOutput": true,
-  "zupervizor.statusBar.enabled": true
+  "zoopervizor.enabled": true,
+  "zoopervizor.api.enabled": true,
+  "zoopervizor.api.port": 3737,
+  "zoopervizor.logging.level": "info",
+  "zoopervizor.logging.showInOutput": true,
+  "zoopervizor.statusBar.enabled": true
 }
 ```
 

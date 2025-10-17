@@ -1,4 +1,4 @@
-# Zupervizor
+# Zoopervizor
 
 A VSCode extension that monitors Roo-Code activities and provides an API bridge for external agent communication.
 
@@ -24,7 +24,7 @@ A VSCode extension that monitors Roo-Code activities and provides an API bridge 
 1. Clone the repository:
    ```bash
    git clone <repository-url>
-   cd zupervizor
+   cd zoopervizor
    ```
 
 2. Install dependencies:
@@ -47,20 +47,20 @@ A VSCode extension that monitors Roo-Code activities and provides an API bridge 
 
 ## Configuration
 
-Configure Zupervizor through VSCode settings (File → Preferences → Settings → search for "Zupervizor"):
+Configure Zoopervizor through VSCode settings (File → Preferences → Settings → search for "Zoopervizor"):
 
 ```json
 {
-  "zupervizor.enabled": true,
-  "zupervizor.api.enabled": true,
-  "zupervizor.api.port": 3737,
-  "zupervizor.logging.level": "info",
-  "zupervizor.logging.showInOutput": true,
-  "zupervizor.statusBar.enabled": true,
-  "zupervizor.bytebot.enabled": true,
-  "zupervizor.bytebot.maxConcurrentDelegations": 3,
-  "zupervizor.bytebot.delegationTimeout": 300000,
-  "zupervizor.bytebot.autoCleanupCompletedAfter": 3600000
+  "zoopervizor.enabled": true,
+  "zoopervizor.api.enabled": true,
+  "zoopervizor.api.port": 3737,
+  "zoopervizor.logging.level": "info",
+  "zoopervizor.logging.showInOutput": true,
+  "zoopervizor.statusBar.enabled": true,
+  "zoopervizor.bytebot.enabled": true,
+  "zoopervizor.bytebot.maxConcurrentDelegations": 3,
+  "zoopervizor.bytebot.delegationTimeout": 300000,
+  "zoopervizor.bytebot.autoCleanupCompletedAfter": 3600000
 }
 ```
 
@@ -68,23 +68,23 @@ Configure Zupervizor through VSCode settings (File → Preferences → Settings 
 
 | Setting | Type | Default | Description |
 |---------|------|---------|-------------|
-| `zupervizor.enabled` | boolean | `true` | Enable/disable Zupervizor monitoring |
-| `zupervizor.api.enabled` | boolean | `true` | Enable/disable API server |
-| `zupervizor.api.port` | number | `3737` | Port for API server |
-| `zupervizor.logging.level` | string | `"info"` | Logging level (debug, info, warn, error) |
-| `zupervizor.logging.showInOutput` | boolean | `true` | Show logs in Output channel |
-| `zupervizor.statusBar.enabled` | boolean | `true` | Show status bar item |
-| `zupervizor.bytebot.enabled` | boolean | `true` | Enable/disable Bytebot adapter integration |
-| `zupervizor.bytebot.maxConcurrentDelegations` | number | `3` | Maximum concurrent delegations |
-| `zupervizor.bytebot.delegationTimeout` | number | `300000` | Delegation timeout in milliseconds (5 minutes) |
-| `zupervizor.bytebot.autoCleanupCompletedAfter` | number | `3600000` | Auto-cleanup completed delegations after milliseconds (1 hour) |
+| `zoopervizor.enabled` | boolean | `true` | Enable/disable Zoopervizor monitoring |
+| `zoopervizor.api.enabled` | boolean | `true` | Enable/disable API server |
+| `zoopervizor.api.port` | number | `3737` | Port for API server |
+| `zoopervizor.logging.level` | string | `"info"` | Logging level (debug, info, warn, error) |
+| `zoopervizor.logging.showInOutput` | boolean | `true` | Show logs in Output channel |
+| `zoopervizor.statusBar.enabled` | boolean | `true` | Show status bar item |
+| `zoopervizor.bytebot.enabled` | boolean | `true` | Enable/disable Bytebot adapter integration |
+| `zoopervizor.bytebot.maxConcurrentDelegations` | number | `3` | Maximum concurrent delegations |
+| `zoopervizor.bytebot.delegationTimeout` | number | `300000` | Delegation timeout in milliseconds (5 minutes) |
+| `zoopervizor.bytebot.autoCleanupCompletedAfter` | number | `3600000` | Auto-cleanup completed delegations after milliseconds (1 hour) |
 
 ## Usage
 
 ### Viewing Logs
 
-1. Click the Zupervizor status bar item (bottom right), or
-2. Run command: `Zupervizor: Show Output` (Ctrl+Shift+P)
+1. Click the Zoopervizor status bar item (bottom right), or
+2. Run command: `Zoopervizor: Show Output` (Ctrl+Shift+P)
 3. View logs in the Output panel
 
 ### Using the REST API
@@ -131,7 +131,7 @@ Connect to `ws://localhost:3737/events` for real-time event streaming.
 const ws = new WebSocket('ws://localhost:3737/events');
 
 ws.onopen = () => {
-  console.log('Connected to Zupervizor');
+  console.log('Connected to Zoopervizor');
   
   // Subscribe to specific events
   ws.send(JSON.stringify({
@@ -193,9 +193,9 @@ See [API Documentation](docs/api-documentation.md) for complete reference.
 
 ## Commands
 
-- `Zupervizor: Show Output` - Open the Zupervizor output channel
-- `Zupervizor: Toggle Status Bar` - Show/hide the status bar item
-- `Zupervizor: Restart API Server` - Restart the API server
+- `Zoopervizor: Show Output` - Open the Zoopervizor output channel
+- `Zoopervizor: Toggle Status Bar` - Show/hide the status bar item
+- `Zoopervizor: Restart API Server` - Restart the API server
 
 ## Troubleshooting
 
@@ -220,8 +220,8 @@ If the API server fails to start:
 
 If events aren't appearing in the Output channel:
 
-1. Check that `zupervizor.enabled` is `true`
-2. Verify `zupervizor.logging.showInOutput` is `true`
+1. Check that `zoopervizor.enabled` is `true`
+2. Verify `zoopervizor.logging.showInOutput` is `true`
 3. Check the logging level setting
 4. Ensure Roo-Code is actually running tasks
 
@@ -231,7 +231,7 @@ If events aren't appearing in the Output channel:
 
 ```bash
 git clone <repository-url>
-cd zupervizor
+cd zoopervizor
 npm install
 ```
 
@@ -255,7 +255,7 @@ This creates a `.vsix` file that can be installed in VSCode.
 
 ## Architecture
 
-Zupervizor consists of several key components:
+Zoopervizor consists of several key components:
 
 - **RooCodeListener**: Connects to Roo-Code API and listens to events
 - **RooCodeController**: Provides methods to control Roo-Code
@@ -266,7 +266,7 @@ Zupervizor consists of several key components:
 
 ### Bytebot Integration
 
-Zupervizor includes an optional adapter layer for integrating with external agents like Bytebot. The adapter provides:
+Zoopervizor includes an optional adapter layer for integrating with external agents like Bytebot. The adapter provides:
 
 - **Task Delegation**: Delegate coding tasks to Roo-Code from external agents
 - **Event Normalization**: Convert Roo-Code events to agent-friendly formats
@@ -304,4 +304,4 @@ For issues and feature requests, please use the GitHub issue tracker.
 
 **Version**: 0.1.0  
 **Status**: MVP Release  
-**Maintained by**: Zupervizor Contributors
+**Maintained by**: Zoopervizor Contributors

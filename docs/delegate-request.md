@@ -1,4 +1,4 @@
-[ZupervizorClient] Received message type: event {
+[ZoopervizorClient] Received message type: event {
   "type": "event",
   "eventName": "taskCompleted",
   "payload": [

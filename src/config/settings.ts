@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 
-export interface ZupervizorConfig {
+export interface ZoopervizorConfig {
 	enabled: boolean;
 	api: {
 		enabled: boolean;
@@ -22,9 +22,9 @@ export interface ZupervizorConfig {
 }
 
 export class ConfigurationManager {
-	private static readonly CONFIG_SECTION = 'zupervizor';
+	private static readonly CONFIG_SECTION = 'zoopervizor';
 
-	static getConfig(): ZupervizorConfig {
+	static getConfig(): ZoopervizorConfig {
 		const config = vscode.workspace.getConfiguration(this.CONFIG_SECTION);
 
 		return {
@@ -49,7 +49,7 @@ export class ConfigurationManager {
 		};
 	}
 
-	static onConfigChange(callback: (config: ZupervizorConfig) => void): vscode.Disposable {
+	static onConfigChange(callback: (config: ZoopervizorConfig) => void): vscode.Disposable {
 		return vscode.workspace.onDidChangeConfiguration((e) => {
 			if (e.affectsConfiguration(this.CONFIG_SECTION)) {
 				callback(this.getConfig());
