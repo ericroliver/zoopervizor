@@ -1,6 +1,10 @@
 # Zoopervizor
 
-A VSCode extension that monitors Roo-Code activities and provides an API bridge for external agent communication.
+> **⚠️ WARNING:**  
+> This is a research project and was completely written using agentic development.  
+> In the end, I decided to go a different direction and will likely not move this forward in the near future.
+
+A VSCode extension that monitors Roo-Code activities and provides an API bridge for external agent communication. The extension installs with no UI other than status bar updates. It will spew Roo events over ws to the endpoint of your choosing, it also exposes an API you can use to send commands to Roo remotely.
 
 ## Features
 
@@ -253,6 +257,34 @@ npm run package
 
 This creates a `.vsix` file that can be installed in VSCode.
 
+### Building and Publishing
+
+For detailed information about building, packaging, and publishing the extension, see the [Build and Publishing Guide](docs/build-and-publish.md).
+
+Quick commands:
+
+```bash
+# Full build with clean
+npm run build
+
+# Package for distribution
+npm run package
+
+# Package as pre-release
+npm run package:pre-release
+
+# Publish to VS Code Marketplace
+npm run publish
+
+# Check code quality and security
+npm run check
+```
+
+For CI/CD automation, GitHub Actions workflows are provided in `.github/workflows/`:
+- `ci.yml` - Continuous integration (build, lint, security audit)
+- `publish.yml` - Automated publishing on version tags
+- `release-prep.yml` - Manual release preparation workflow
+
 ## Architecture
 
 Zoopervizor consists of several key components:
@@ -277,11 +309,12 @@ See [Architecture Plan](docs/architecture-plan.md) for detailed information.
 
 ## Documentation
 
+- [Quick Start Guide](docs/quick-start.md) - Quick start for users and developers
+- [Build and Publishing Guide](docs/build-and-publish.md) - Complete guide for building and publishing
 - [Architecture Plan](docs/architecture-plan.md) - Detailed system architecture
 - [Implementation Guide](docs/implementation-guide.md) - Step-by-step implementation
 - [API Documentation](docs/api-documentation.md) - Complete API reference
 - [Bytebot Integration](docs/bytebot-integration.md) - External agent integration guide
-- [Quick Start Guide](docs/quick-start.md) - Quick start for users and developers
 
 ## Contributing
 

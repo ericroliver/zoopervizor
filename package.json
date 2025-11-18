@@ -4,6 +4,23 @@
   "description": "Monitor and control Roo-Code activities with external API bridge",
   "version": "0.1.0",
   "publisher": "zoopervizor",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ericroliver/zoopervizor.git"
+  },
+  "homepage": "https://github.com/ericroliver/zoopervizor#readme",
+  "bugs": {
+    "url": "https://github.com/ericroliver/zoopervizor/issues"
+  },
+  "keywords": [
+    "roo-code",
+    "monitoring",
+    "api",
+    "automation",
+    "agent",
+    "websocket",
+    "bytebot"
+  ],
   "engines": {
     "vscode": "^1.85.0"
   },
@@ -95,8 +112,20 @@
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
+    "build": "npm run compile",
+    "clean": "rm -rf out *.vsix",
+    "prebuild": "npm run clean",
+    "prepackage": "npm run build",
     "package": "vsce package",
-    "lint": "eslint src --ext ts"
+    "package:pre-release": "vsce package --pre-release",
+    "publish": "vsce publish",
+    "publish:pre-release": "vsce publish --pre-release",
+    "lint": "eslint src --ext ts",
+    "lint:fix": "eslint src --ext ts --fix",
+    "audit:check": "npm audit --production",
+    "audit:fix": "npm audit fix",
+    "check": "npm run lint && npm run compile && npm run audit:check",
+    "vsce:ls": "vsce ls"
   },
   "dependencies": {
     "express": "^4.18.2",
@@ -107,7 +136,7 @@
     "@types/node": "^20.8.0",
     "@types/vscode": "^1.85.0",
     "@types/ws": "^8.5.8",
-    "@vscode/vsce": "^2.22.0",
+    "@vscode/vsce": "^3.6.2",
     "typescript": "^5.2.2"
   }
 }
