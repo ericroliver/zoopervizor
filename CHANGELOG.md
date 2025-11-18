@@ -106,5 +106,5 @@ Bug fixes and improvements:
 - Security improvements or fixes
 ```
 
-[Unreleased]: https://github.com/[your-org]/zoopervizor/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/[your-org]/zoopervizor/releases/tag/v0.1.0
+[Unreleased]: https://github.com/your-org/zoopervizor/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/your-org/zoopervizor/releases/tag/v0.1.0

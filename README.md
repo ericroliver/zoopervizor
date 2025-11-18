@@ -1,6 +1,10 @@
 # Zoopervizor
 
-A VSCode extension that monitors Roo-Code activities and provides an API bridge for external agent communication.
+> **⚠️ WARNING:**  
+> This is a research project and was completely written using agentic development.  
+> In the end, I decided to go a different direction and will likely not move this forward in the near future.
+
+A VSCode extension that monitors Roo-Code activities and provides an API bridge for external agent communication. The extension installs with no UI other than status bar updates. It will spew Roo events over ws to the endpoint of your choosing, it also exposes an API you can use to send commands to Roo remotely.
 
 ## Features
 

@@ -4,6 +4,23 @@
   "description": "Monitor and control Roo-Code activities with external API bridge",
   "version": "0.1.0",
   "publisher": "zoopervizor",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ericroliver/zoopervizor.git"
+  },
+  "homepage": "https://github.com/ericroliver/zoopervizor#readme",
+  "bugs": {
+    "url": "https://github.com/ericroliver/zoopervizor/issues"
+  },
+  "keywords": [
+    "roo-code",
+    "monitoring",
+    "api",
+    "automation",
+    "agent",
+    "websocket",
+    "bytebot"
+  ],
   "engines": {
     "vscode": "^1.85.0"
   },
@@ -119,7 +136,7 @@
     "@types/node": "^20.8.0",
     "@types/vscode": "^1.85.0",
     "@types/ws": "^8.5.8",
-    "@vscode/vsce": "^2.22.0",
+    "@vscode/vsce": "^3.6.2",
     "typescript": "^5.2.2"
   }
 }
