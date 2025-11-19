@@ -42,7 +42,7 @@ export interface ClineMessage {
 	type: string;
 	say?: string;
 	text?: string;
-	[key: string]: any;
+	partial?: boolean;
 }
 
 export interface MessageEvent {
@@ -54,7 +54,7 @@ export interface MessageEvent {
 export interface RooCodeSettings {
 	mode?: string;
 	currentApiConfigName?: string;
-	[key: string]: any;
+	[key: string]: unknown;
 }
 
 export interface TaskOptions {
@@ -65,13 +65,13 @@ export interface TaskOptions {
 }
 
 export interface ProviderSettings {
-	[key: string]: any;
+	[key: string]: unknown;
 }
 
 export interface RooCodeAPI {
 	// Event emitter methods
-	on(event: RooCodeEventName, listener: (...args: any[]) => void): void;
-	off(event: RooCodeEventName, listener: (...args: any[]) => void): void;
+	on(event: RooCodeEventName, listener: (...args: unknown[]) => void): void;
+	off(event: RooCodeEventName, listener: (...args: unknown[]) => void): void;
 
 	// Task control
 	startNewTask(options: TaskOptions): Promise<string>;

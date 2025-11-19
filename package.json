@@ -22,7 +22,8 @@
     "bytebot"
   ],
   "engines": {
-    "vscode": "^1.85.0"
+    "vscode": "^1.85.0",
+    "node": ">=18.0.0"
   },
   "categories": [
     "Other"
@@ -113,7 +114,7 @@
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "build": "npm run compile",
-    "clean": "rm -rf out *.vsix",
+    "clean": "node -e \"require('fs').rmSync('out', {recursive:true, force:true}); require('fs').readdirSync('.').filter(f=>f.endsWith('.vsix')).forEach(f=>require('fs').unlinkSync(f))\"",
     "prebuild": "npm run clean",
     "prepackage": "npm run build",
     "package": "vsce package",
@@ -136,7 +137,10 @@
     "@types/node": "^20.8.0",
     "@types/vscode": "^1.85.0",
     "@types/ws": "^8.5.8",
+    "@typescript-eslint/eslint-plugin": "^8.47.0",
+    "@typescript-eslint/parser": "^8.47.0",
     "@vscode/vsce": "^3.6.2",
+    "eslint": "^8.57.1",
     "typescript": "^5.2.2"
   }
 }

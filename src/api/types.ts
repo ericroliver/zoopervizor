@@ -1,15 +1,16 @@
 import { RooCodeEventName } from '../roo-code/types';
 import { DelegationRequest } from '../bytebot/types';
+import { WebSocket } from 'ws';
 
 // API Request/Response types
 
 export interface ApiError {
 	code: string;
 	message: string;
-	details?: any;
+	details?: unknown;
 }
 
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
 	data?: T;
 	error?: ApiError;
 }
@@ -27,7 +28,7 @@ export interface StatusResponse {
 	isReady: boolean;
 	currentTaskStack: string[];
 	activeProfile?: string;
-	configuration: any;
+	configuration: Record<string, unknown>;
 }
 
 // Task endpoints
@@ -36,7 +37,7 @@ export interface StartTaskRequest {
 	configuration?: {
 		mode?: string;
 		currentApiConfigName?: string;
-		[key: string]: any;
+		[key: string]: unknown;
 	};
 	images?: string[];
 	newTab?: boolean;
@@ -58,7 +59,7 @@ export interface ResumeTaskRequest {
 
 // Configuration endpoints
 export interface UpdateConfigurationRequest {
-	[key: string]: any;
+	[key: string]: unknown;
 }
 
 // Profile endpoints
@@ -76,7 +77,7 @@ export interface WebSocketMessage {
 	type: 'delegate_task' | 'subscribe' | 'unsubscribe' | 'event' | 'subscribed' | 'unsubscribed' | 'error' | 'delegation_response';
 	events?: RooCodeEventName[];
 	eventName?: RooCodeEventName;
-	payload?: any;
+	payload?: unknown;
 	timestamp?: string;
 	taskId?: string;
 	error?: string;
@@ -91,6 +92,6 @@ export interface WebSocketMessage {
 
 export interface WebSocketClient {
 	id: string;
-	ws: any;
+	ws: WebSocket;
 	subscribedEvents: Set<RooCodeEventName>;
 }

@@ -85,7 +85,7 @@ export class QuestionHandler {
    */
   getStats(): {
     total: number;
-  } {
+    } {
     return {
       total: this.pendingQuestions.size,
     };

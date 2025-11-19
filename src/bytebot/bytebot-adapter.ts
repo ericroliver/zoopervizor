@@ -28,7 +28,7 @@ export class BytebotAdapter {
 
   constructor(
     rooCodeController: RooCodeController,
-    websocketHandler: WebSocketHandler
+    websocketHandler: WebSocketHandler,
   ) {
     this.rooCodeController = rooCodeController;
     this.websocketHandler = websocketHandler;
@@ -75,8 +75,8 @@ export class BytebotAdapter {
     this.logger.info(`New delegation request: ${request.delegation_id} from task ${request.bytebot_task_id}`);
 
     try {
-      // Create delegation state
-      const delegation = this.taskCoordinator.createDelegation(request);
+      // Create delegation state (stored in coordinator for future reference)
+      const _delegation = this.taskCoordinator.createDelegation(request);
 
       // Prepare Roo-Code task options
       const taskOptions: TaskOptions = {
@@ -93,7 +93,7 @@ export class BytebotAdapter {
 
       // Start the Roo-Code task
       const rooTaskId = await this.rooCodeController.startNewTask(taskOptions);
-      
+
       // Link the Roo task to the delegation
       this.taskCoordinator.linkRooTask(request.delegation_id, rooTaskId);
       this.taskCoordinator.updateStatus(request.delegation_id, DelegationStatus.IN_PROGRESS);
@@ -111,20 +111,20 @@ export class BytebotAdapter {
       };
     } catch (error) {
       this.logger.error(`Failed to delegate task ${request.delegation_id}:`, error);
-      
+
       // Update delegation status
       const delegation = this.taskCoordinator.getDelegation(request.delegation_id);
       if (delegation) {
         this.taskCoordinator.updateStatus(
           request.delegation_id,
           DelegationStatus.FAILED,
-          error instanceof Error ? error.message : 'Unknown error'
+          error instanceof Error ? error.message : 'Unknown error',
         );
 
         // Emit error event
         const errorEvent = this.eventNormalizer.createErrorEvent(
           delegation,
-          error instanceof Error ? error.message : 'Unknown error'
+          error instanceof Error ? error.message : 'Unknown error',
         );
         this.broadcastDelegationEvent(errorEvent);
       }
@@ -225,7 +225,7 @@ export class BytebotAdapter {
   /**
    * Handle Roo-Code events
    */
-  handleRooCodeEvent(eventName: RooCodeEventName, eventData: any): void {
+  handleRooCodeEvent(eventName: RooCodeEventName, eventData: unknown): void {
     if (!this.enabled) {
       return;
     }
@@ -237,10 +237,20 @@ export class BytebotAdapter {
     // Extract taskId based on event type
     if (eventName === 'message') {
       // Message events have taskId nested in the event structure
-      taskId = eventData.taskId || eventData[0]?.taskId;
+      const data = eventData as { taskId?: string } | Array<{ taskId?: string }>;
+      if (Array.isArray(data) && data[0]) {
+        taskId = data[0].taskId;
+      } else if (typeof data === 'object' && data !== null && 'taskId' in data) {
+        taskId = data.taskId;
+      }
     } else {
       // Other events have taskId directly
-      taskId = eventData.taskId || eventData;
+      const data = eventData as { taskId?: string } | string;
+      if (typeof data === 'string') {
+        taskId = data;
+      } else if (typeof data === 'object' && data !== null && 'taskId' in data) {
+        taskId = data.taskId;
+      }
     }
 
     if (taskId) {
@@ -258,7 +268,7 @@ export class BytebotAdapter {
     const delegationEvent = this.eventNormalizer.normalize(
       eventName,
       eventData,
-      delegation
+      delegation,
     );
 
     if (!delegationEvent) {
@@ -278,7 +288,7 @@ export class BytebotAdapter {
    */
   private updateDelegationFromEvent(
     delegation: DelegationState,
-    event: DelegationEvent
+    event: DelegationEvent,
   ): void {
     switch (event.type) {
       case 'delegation_completed':
@@ -286,12 +296,12 @@ export class BytebotAdapter {
         if (event.payload.result) {
           this.taskCoordinator.setResult(
             delegation.delegation_id,
-            event.payload.result
+            event.payload.result,
           );
         }
         this.taskCoordinator.updateStatus(
           delegation.delegation_id,
-          DelegationStatus.COMPLETED
+          DelegationStatus.COMPLETED,
         );
         break;
 
@@ -301,14 +311,14 @@ export class BytebotAdapter {
         this.taskCoordinator.updateStatus(
           delegation.delegation_id,
           DelegationStatus.FAILED,
-          event.payload.error
+          event.payload.error,
         );
         break;
 
       case 'delegation_cancelled':
         this.taskCoordinator.updateStatus(
           delegation.delegation_id,
-          DelegationStatus.CANCELLED
+          DelegationStatus.CANCELLED,
         );
         break;
     }
@@ -332,10 +342,10 @@ export class BytebotAdapter {
    */
   getStats(): {
     enabled: boolean;
-    delegations: any;
-    questions: any;
-    eventNormalizer: any;
-  } {
+    delegations: Record<string, unknown>;
+    questions: Record<string, unknown>;
+    eventNormalizer: Record<string, unknown>;
+    } {
     return {
       enabled: this.enabled,
       delegations: this.taskCoordinator.getStats(),
@@ -350,7 +360,7 @@ export class BytebotAdapter {
   cleanup(): void {
     const cleaned = this.taskCoordinator.cleanupCompleted();
     const questionsCleared = this.questionHandler.cleanupOld();
-    
+
     if (cleaned > 0 || questionsCleared > 0) {
       this.logger.info(`Cleanup: ${cleaned} delegations, ${questionsCleared} questions`);
     }
