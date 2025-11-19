@@ -27,19 +27,56 @@ jobs:
     - name: Install dependencies
       run: npm ci
 
+    - name: Verify dependencies installed
+      run: |
+        echo "Node version: $(node --version)"
+        echo "NPM version: $(npm --version)"
+        echo "TypeScript version: $(npx tsc --version)"
+        echo "Checking critical packages..."
+        npm list typescript @typescript-eslint/parser @typescript-eslint/eslint-plugin eslint || true
+      shell: bash
+
     - name: Lint
       run: npm run lint
       continue-on-error: true
 
+    - name: Clean before compile
+      run: npm run clean || true
+      shell: bash
+
     - name: Compile TypeScript
       run: npm run compile
+
+    - name: List build output
+      run: |
+        echo "Checking for out directory..."
+        ls -la || dir
+        if [ -d "out" ]; then
+          echo "✓ out directory exists"
+          echo "Contents:"
+          ls -la out/ || true
+        else
+          echo "✗ out directory not found"
+        fi
+      shell: bash
 
     - name: Verify build artifacts
       run: |
         if [ ! -d "out" ]; then
-          echo "Build failed: out directory not found"
+          echo "❌ Build failed: out directory not found"
+          echo "Current directory contents:"
+          ls -la
+          echo "Checking tsconfig.json:"
+          cat tsconfig.json
           exit 1
         fi
+        if [ ! -f "out/extension.js" ]; then
+          echo "❌ Build failed: extension.js not found in out directory"
+          echo "Out directory contents:"
+          ls -la out/
+          exit 1
+        fi
+        echo "✅ Build artifacts verified successfully"
       shell: bash
 
     - name: Package extension

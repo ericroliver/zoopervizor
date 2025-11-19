@@ -113,7 +113,7 @@
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "build": "npm run compile",
-    "clean": "rm -rf out *.vsix",
+    "clean": "node -e \"require('fs').rmSync('out', {recursive:true, force:true}); require('fs').readdirSync('.').filter(f=>f.endsWith('.vsix')).forEach(f=>require('fs').unlinkSync(f))\"",
     "prebuild": "npm run clean",
     "prepackage": "npm run build",
     "package": "vsce package",
