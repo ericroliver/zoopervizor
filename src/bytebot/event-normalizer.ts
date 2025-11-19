@@ -22,8 +22,8 @@ export class EventNormalizer {
    */
   normalize(
     rooEventName: RooCodeEventName,
-    rooEventData: any,
-    delegation: DelegationState
+    rooEventData: unknown,
+    delegation: DelegationState,
   ): DelegationEvent | null {
     try {
       // Map Roo-Code events to delegation events
@@ -41,7 +41,7 @@ export class EventNormalizer {
           return this.normalizeTaskAborted(rooEventData, delegation);
 
         case 'message':
-          return this.normalizeMessage(rooEventData, delegation);
+          return this.normalizeMessage(rooEventData as MessageEvent, delegation);
 
         case 'taskToolFailed':
           return this.normalizeToolFailed(rooEventData, delegation);
@@ -75,8 +75,8 @@ export class EventNormalizer {
    * Normalize taskCreated event
    */
   private normalizeTaskCreated(
-    data: any,
-    delegation: DelegationState
+    data: unknown,
+    delegation: DelegationState,
   ): DelegationEvent {
     return {
       type: 'delegation_started',
@@ -94,8 +94,8 @@ export class EventNormalizer {
    * Normalize taskStarted event
    */
   private normalizeTaskStarted(
-    data: any,
-    delegation: DelegationState
+    data: unknown,
+    delegation: DelegationState,
   ): DelegationEvent {
     return {
       type: 'delegation_progress',
@@ -114,8 +114,8 @@ export class EventNormalizer {
    * Only sends delegation_completed when both taskCompleted event AND final completion result have been received
    */
   private normalizeTaskCompleted(
-    data: any,
-    delegation: DelegationState
+    data: unknown,
+    delegation: DelegationState,
   ): DelegationEvent | null {
     // Mark that taskCompleted event was received
     this.taskCompletedReceived.set(delegation.delegation_id, true);
@@ -123,7 +123,7 @@ export class EventNormalizer {
 
     // Check if we also have the completion result
     const completionResult = this.completionResults.get(delegation.delegation_id);
-    
+
     if (!completionResult) {
       // We don't have the completion result yet, wait for it
       this.logger.info(`Waiting for completion result for delegation ${delegation.delegation_id}`);
@@ -131,8 +131,11 @@ export class EventNormalizer {
     }
 
     // We have both taskCompleted and completion result, send the event
-    this.logger.info(`Both taskCompleted and completion result received for delegation ${delegation.delegation_id}, sending delegation_completed`);
-    
+    this.logger.info(
+      'Both taskCompleted and completion result received for delegation ' +
+      `${delegation.delegation_id}, sending delegation_completed`,
+    );
+
     const duration = delegation.completed_at
       ? delegation.completed_at - delegation.created_at
       : undefined;
@@ -163,8 +166,8 @@ export class EventNormalizer {
    * Normalize taskAborted event
    */
   private normalizeTaskAborted(
-    data: any,
-    delegation: DelegationState
+    data: unknown,
+    delegation: DelegationState,
   ): DelegationEvent {
     return {
       type: 'delegation_cancelled',
@@ -184,31 +187,37 @@ export class EventNormalizer {
    */
   private normalizeMessage(
     data: MessageEvent,
-    delegation: DelegationState
+    delegation: DelegationState,
   ): DelegationEvent | null {
     // Only normalize say messages that are created or updated
     if (data.message?.type !== 'say') {
       return null;
     }
 
-    const message = data.message.say || data.message.text || 'Working...';
+    const message = data.message.say ?? data.message.text ?? 'Working...';
     const isPartial = data.message.partial !== false; // Default to true if not specified
 
     // Store completion result for later use in taskCompleted event
     // This avoids sending duplicate completion events
     // When partial is false and say is 'completion_result', this is the final result
     if (data.message.say === 'completion_result' && !isPartial) {
-      const resultText = data.message.text || 'Task completed successfully';
+      const resultText = data.message.text ?? 'Task completed successfully';
       this.completionResults.set(delegation.delegation_id, resultText);
-      this.logger.info(`Stored completion result for delegation ${delegation.delegation_id}: ${resultText.substring(0, 100)}...`);
-      
+      this.logger.info(
+        `Stored completion result for delegation ${delegation.delegation_id}: ` +
+        `${resultText.substring(0, 100)}...`,
+      );
+
       // Check if we already received taskCompleted event
       const taskCompleted = this.taskCompletedReceived.get(delegation.delegation_id);
-      
+
       if (taskCompleted) {
         // We have both completion result and taskCompleted, send the event now
-        this.logger.info(`Both completion result and taskCompleted received for delegation ${delegation.delegation_id}, sending delegation_completed`);
-        
+        this.logger.info(
+          'Both completion result and taskCompleted received for delegation ' +
+          `${delegation.delegation_id}, sending delegation_completed`,
+        );
+
         const duration = delegation.completed_at
           ? delegation.completed_at - delegation.created_at
           : undefined;
@@ -234,7 +243,7 @@ export class EventNormalizer {
           },
         };
       }
-      
+
       // Don't send event yet - wait for taskCompleted
       return null;
     }
@@ -260,10 +269,10 @@ export class EventNormalizer {
    * Normalize tool failed event
    */
   private normalizeToolFailed(
-    data: any,
-    delegation: DelegationState
+    data: unknown,
+    delegation: DelegationState,
   ): DelegationEvent {
-    const errorMessage = data.error || 'Tool execution failed';
+    const errorMessage = (data as { error?: string })?.error ?? 'Tool execution failed';
 
     return {
       type: 'delegation_error',
@@ -283,7 +292,7 @@ export class EventNormalizer {
    */
   createProgressEvent(
     delegation: DelegationState,
-    message: string
+    message: string,
   ): DelegationEvent {
     return {
       type: 'delegation_progress',
@@ -302,7 +311,7 @@ export class EventNormalizer {
    */
   createErrorEvent(
     delegation: DelegationState,
-    error: string
+    error: string,
   ): DelegationEvent {
     return {
       type: 'delegation_error',

@@ -1,253 +1,262 @@
-import { Request, Response, Router } from 'express';
+import { Request, Response, Router, NextFunction } from 'express';
 import { RooCodeController } from '../roo-code/controller';
 import { RooCodeListener } from '../roo-code/listener';
 import { Logger } from '../logging/logger';
 import {
-	HealthResponse,
-	StatusResponse,
-	StartTaskRequest,
-	StartTaskResponse,
-	SendMessageRequest,
-	ResumeTaskRequest,
-	UpdateConfigurationRequest,
-	SetActiveProfileRequest,
-	ProfilesResponse,
-	ApiError,
+  HealthResponse,
+  StatusResponse,
+  StartTaskRequest,
+  StartTaskResponse,
+  SendMessageRequest,
+  ResumeTaskRequest,
+  UpdateConfigurationRequest,
+  SetActiveProfileRequest,
+  ProfilesResponse,
+  ApiError,
 } from './types';
 
 export class ApiRoutes {
-	private router: Router;
-	private controller: RooCodeController;
-	private listener: RooCodeListener;
-	private logger: Logger;
-	private startTime: number;
+  private router: Router;
+  private controller: RooCodeController;
+  private listener: RooCodeListener;
+  private logger: Logger;
+  private startTime: number;
 
-	constructor(controller: RooCodeController, listener: RooCodeListener, logger: Logger) {
-		this.router = Router();
-		this.controller = controller;
-		this.listener = listener;
-		this.logger = logger;
-		this.startTime = Date.now();
-		this.setupRoutes();
-	}
+  constructor(controller: RooCodeController, listener: RooCodeListener, logger: Logger) {
+    this.router = Router();
+    this.controller = controller;
+    this.listener = listener;
+    this.logger = logger;
+    this.startTime = Date.now();
+    this.setupRoutes();
+  }
 
-	private setupRoutes(): void {
-		// Health check
-		this.router.get('/health', this.handleHealth.bind(this));
+  private setupRoutes(): void {
+    // Health check
+    this.router.get('/health', this.handleHealth.bind(this));
 
-		// Status
-		this.router.get('/status', this.handleStatus.bind(this));
+    // Status
+    this.router.get('/status', this.handleStatus.bind(this));
 
-		// Task control
-		this.router.post('/tasks/start', this.handleStartTask.bind(this));
-		this.router.post('/tasks/message', this.handleSendMessage.bind(this));
-		this.router.post('/tasks/cancel', this.handleCancelTask.bind(this));
-		this.router.post('/tasks/resume', this.handleResumeTask.bind(this));
+    // Task control
+    this.router.post('/tasks/start', this.asyncHandler(this.handleStartTask.bind(this)));
+    this.router.post('/tasks/message', this.asyncHandler(this.handleSendMessage.bind(this)));
+    this.router.post('/tasks/cancel', this.asyncHandler(this.handleCancelTask.bind(this)));
+    this.router.post('/tasks/resume', this.asyncHandler(this.handleResumeTask.bind(this)));
 
-		// Configuration
-		this.router.get('/configuration', this.handleGetConfiguration.bind(this));
-		this.router.put('/configuration', this.handleUpdateConfiguration.bind(this));
+    // Configuration
+    this.router.get('/configuration', this.handleGetConfiguration.bind(this));
+    this.router.put('/configuration', this.asyncHandler(this.handleUpdateConfiguration.bind(this)));
 
-		// Profiles
-		this.router.get('/profiles', this.handleGetProfiles.bind(this));
-		this.router.post('/profiles/active', this.handleSetActiveProfile.bind(this));
-	}
+    // Profiles
+    this.router.get('/profiles', this.handleGetProfiles.bind(this));
+    this.router.post('/profiles/active', this.asyncHandler(this.handleSetActiveProfile.bind(this)));
+  }
 
-	private handleHealth(req: Request, res: Response): void {
-		const response: HealthResponse = {
-			status: 'ok',
-			rooCodeConnected: this.listener.isConnected(),
-			version: '0.1.0',
-			uptime: Math.floor((Date.now() - this.startTime) / 1000),
-		};
+  // Wrapper for async route handlers to ensure proper error handling
+  private asyncHandler(
+    fn: (req: Request, res: Response) => Promise<void>,
+  ): (req: Request, res: Response, next: NextFunction) => void {
+    return (req: Request, res: Response, next: NextFunction): void => {
+      Promise.resolve(fn(req, res)).catch(next);
+    };
+  }
 
-		if (!this.listener.isConnected()) {
-			res.status(503).json(response);
-		} else {
-			res.json(response);
-		}
-	}
+  private handleHealth(req: Request, res: Response): void {
+    const response: HealthResponse = {
+      status: 'ok',
+      rooCodeConnected: this.listener.isConnected(),
+      version: '0.1.0',
+      uptime: Math.floor((Date.now() - this.startTime) / 1000),
+    };
 
-	private handleStatus(req: Request, res: Response): void {
-		if (!this.listener.isConnected()) {
-			return this.sendError(res, 503, 'ROO_CODE_NOT_CONNECTED', 'Roo-Code extension is not connected');
-		}
+    if (!this.listener.isConnected()) {
+      res.status(503).json(response);
+    } else {
+      res.json(response);
+    }
+  }
 
-		try {
-			const response: StatusResponse = {
-				isReady: this.controller.isReady(),
-				currentTaskStack: this.controller.getCurrentTaskStack(),
-				activeProfile: this.controller.getActiveProfile(),
-				configuration: this.controller.getConfiguration(),
-			};
-			res.json(response);
-		} catch (error) {
-			this.logger.error('Failed to get status', error);
-			this.sendError(res, 500, 'INTERNAL_ERROR', 'Failed to get status');
-		}
-	}
+  private handleStatus(req: Request, res: Response): void {
+    if (!this.listener.isConnected()) {
+      return this.sendError(res, 503, 'ROO_CODE_NOT_CONNECTED', 'Roo-Code extension is not connected');
+    }
 
-	private async handleStartTask(req: Request, res: Response): Promise<void> {
-		if (!this.listener.isConnected()) {
-			return this.sendError(res, 503, 'ROO_CODE_NOT_CONNECTED', 'Roo-Code extension is not connected');
-		}
+    try {
+      const response: StatusResponse = {
+        isReady: this.controller.isReady(),
+        currentTaskStack: this.controller.getCurrentTaskStack(),
+        activeProfile: this.controller.getActiveProfile(),
+        configuration: this.controller.getConfiguration(),
+      };
+      res.json(response);
+    } catch (error) {
+      this.logger.error('Failed to get status', error);
+      this.sendError(res, 500, 'INTERNAL_ERROR', 'Failed to get status');
+    }
+  }
 
-		const body: StartTaskRequest = req.body;
+  private async handleStartTask(req: Request, res: Response): Promise<void> {
+    if (!this.listener.isConnected()) {
+      return this.sendError(res, 503, 'ROO_CODE_NOT_CONNECTED', 'Roo-Code extension is not connected');
+    }
 
-		if (!body.text) {
-			return this.sendError(res, 400, 'INVALID_REQUEST', 'Missing required field: text');
-		}
+    const body = req.body as StartTaskRequest;
 
-		try {
-			const taskId = await this.controller.startNewTask({
-				text: body.text,
-				configuration: body.configuration,
-				images: body.images,
-				newTab: body.newTab,
-			});
+    if (!body.text) {
+      return this.sendError(res, 400, 'INVALID_REQUEST', 'Missing required field: text');
+    }
 
-			const response: StartTaskResponse = {
-				taskId,
-				status: 'started',
-			};
-			res.json(response);
-		} catch (error) {
-			this.logger.error('Failed to start task', error);
-			this.sendError(res, 500, 'INTERNAL_ERROR', 'Failed to start task');
-		}
-	}
+    try {
+      const taskId = await this.controller.startNewTask({
+        text: body.text,
+        configuration: body.configuration,
+        images: body.images,
+        newTab: body.newTab,
+      });
 
-	private async handleSendMessage(req: Request, res: Response): Promise<void> {
-		if (!this.listener.isConnected()) {
-			return this.sendError(res, 503, 'ROO_CODE_NOT_CONNECTED', 'Roo-Code extension is not connected');
-		}
+      const response: StartTaskResponse = {
+        taskId,
+        status: 'started',
+      };
+      res.json(response);
+    } catch (error) {
+      this.logger.error('Failed to start task', error);
+      this.sendError(res, 500, 'INTERNAL_ERROR', 'Failed to start task');
+    }
+  }
 
-		const body: SendMessageRequest = req.body;
+  private async handleSendMessage(req: Request, res: Response): Promise<void> {
+    if (!this.listener.isConnected()) {
+      return this.sendError(res, 503, 'ROO_CODE_NOT_CONNECTED', 'Roo-Code extension is not connected');
+    }
 
-		if (!body.message) {
-			return this.sendError(res, 400, 'INVALID_REQUEST', 'Missing required field: message');
-		}
+    const body = req.body as SendMessageRequest;
 
-		try {
-			await this.controller.sendMessage(body.message, body.images);
-			res.json({ status: 'sent' });
-		} catch (error) {
-			this.logger.error('Failed to send message', error);
-			this.sendError(res, 500, 'INTERNAL_ERROR', 'Failed to send message');
-		}
-	}
+    if (!body.message) {
+      return this.sendError(res, 400, 'INVALID_REQUEST', 'Missing required field: message');
+    }
 
-	private async handleCancelTask(req: Request, res: Response): Promise<void> {
-		if (!this.listener.isConnected()) {
-			return this.sendError(res, 503, 'ROO_CODE_NOT_CONNECTED', 'Roo-Code extension is not connected');
-		}
+    try {
+      await this.controller.sendMessage(body.message, body.images);
+      res.json({ status: 'sent' });
+    } catch (error) {
+      this.logger.error('Failed to send message', error);
+      this.sendError(res, 500, 'INTERNAL_ERROR', 'Failed to send message');
+    }
+  }
 
-		try {
-			await this.controller.cancelCurrentTask();
-			res.json({ status: 'cancelled' });
-		} catch (error) {
-			this.logger.error('Failed to cancel task', error);
-			this.sendError(res, 500, 'INTERNAL_ERROR', 'Failed to cancel task');
-		}
-	}
+  private async handleCancelTask(req: Request, res: Response): Promise<void> {
+    if (!this.listener.isConnected()) {
+      return this.sendError(res, 503, 'ROO_CODE_NOT_CONNECTED', 'Roo-Code extension is not connected');
+    }
 
-	private async handleResumeTask(req: Request, res: Response): Promise<void> {
-		if (!this.listener.isConnected()) {
-			return this.sendError(res, 503, 'ROO_CODE_NOT_CONNECTED', 'Roo-Code extension is not connected');
-		}
+    try {
+      await this.controller.cancelCurrentTask();
+      res.json({ status: 'cancelled' });
+    } catch (error) {
+      this.logger.error('Failed to cancel task', error);
+      this.sendError(res, 500, 'INTERNAL_ERROR', 'Failed to cancel task');
+    }
+  }
 
-		const body: ResumeTaskRequest = req.body;
+  private async handleResumeTask(req: Request, res: Response): Promise<void> {
+    if (!this.listener.isConnected()) {
+      return this.sendError(res, 503, 'ROO_CODE_NOT_CONNECTED', 'Roo-Code extension is not connected');
+    }
 
-		if (!body.taskId) {
-			return this.sendError(res, 400, 'INVALID_REQUEST', 'Missing required field: taskId');
-		}
+    const body = req.body as ResumeTaskRequest;
 
-		try {
-			await this.controller.resumeTask(body.taskId);
-			res.json({ status: 'resumed' });
-		} catch (error) {
-			this.logger.error('Failed to resume task', error);
-			this.sendError(res, 500, 'INTERNAL_ERROR', 'Failed to resume task');
-		}
-	}
+    if (!body.taskId) {
+      return this.sendError(res, 400, 'INVALID_REQUEST', 'Missing required field: taskId');
+    }
 
-	private handleGetConfiguration(req: Request, res: Response): void {
-		if (!this.listener.isConnected()) {
-			return this.sendError(res, 503, 'ROO_CODE_NOT_CONNECTED', 'Roo-Code extension is not connected');
-		}
+    try {
+      await this.controller.resumeTask(body.taskId);
+      res.json({ status: 'resumed' });
+    } catch (error) {
+      this.logger.error('Failed to resume task', error);
+      this.sendError(res, 500, 'INTERNAL_ERROR', 'Failed to resume task');
+    }
+  }
 
-		try {
-			const configuration = this.controller.getConfiguration();
-			res.json(configuration);
-		} catch (error) {
-			this.logger.error('Failed to get configuration', error);
-			this.sendError(res, 500, 'INTERNAL_ERROR', 'Failed to get configuration');
-		}
-	}
+  private handleGetConfiguration(req: Request, res: Response): void {
+    if (!this.listener.isConnected()) {
+      return this.sendError(res, 503, 'ROO_CODE_NOT_CONNECTED', 'Roo-Code extension is not connected');
+    }
 
-	private async handleUpdateConfiguration(req: Request, res: Response): Promise<void> {
-		if (!this.listener.isConnected()) {
-			return this.sendError(res, 503, 'ROO_CODE_NOT_CONNECTED', 'Roo-Code extension is not connected');
-		}
+    try {
+      const configuration = this.controller.getConfiguration();
+      res.json(configuration);
+    } catch (error) {
+      this.logger.error('Failed to get configuration', error);
+      this.sendError(res, 500, 'INTERNAL_ERROR', 'Failed to get configuration');
+    }
+  }
 
-		const body: UpdateConfigurationRequest = req.body;
+  private async handleUpdateConfiguration(req: Request, res: Response): Promise<void> {
+    if (!this.listener.isConnected()) {
+      return this.sendError(res, 503, 'ROO_CODE_NOT_CONNECTED', 'Roo-Code extension is not connected');
+    }
 
-		try {
-			await this.controller.setConfiguration(body);
-			res.json({ status: 'updated' });
-		} catch (error) {
-			this.logger.error('Failed to update configuration', error);
-			this.sendError(res, 500, 'INTERNAL_ERROR', 'Failed to update configuration');
-		}
-	}
+    const body = req.body as UpdateConfigurationRequest;
 
-	private handleGetProfiles(req: Request, res: Response): void {
-		if (!this.listener.isConnected()) {
-			return this.sendError(res, 503, 'ROO_CODE_NOT_CONNECTED', 'Roo-Code extension is not connected');
-		}
+    try {
+      await this.controller.setConfiguration(body);
+      res.json({ status: 'updated' });
+    } catch (error) {
+      this.logger.error('Failed to update configuration', error);
+      this.sendError(res, 500, 'INTERNAL_ERROR', 'Failed to update configuration');
+    }
+  }
 
-		try {
-			const response: ProfilesResponse = {
-				profiles: this.controller.getProfiles(),
-				active: this.controller.getActiveProfile(),
-			};
-			res.json(response);
-		} catch (error) {
-			this.logger.error('Failed to get profiles', error);
-			this.sendError(res, 500, 'INTERNAL_ERROR', 'Failed to get profiles');
-		}
-	}
+  private handleGetProfiles(req: Request, res: Response): void {
+    if (!this.listener.isConnected()) {
+      return this.sendError(res, 503, 'ROO_CODE_NOT_CONNECTED', 'Roo-Code extension is not connected');
+    }
 
-	private async handleSetActiveProfile(req: Request, res: Response): Promise<void> {
-		if (!this.listener.isConnected()) {
-			return this.sendError(res, 503, 'ROO_CODE_NOT_CONNECTED', 'Roo-Code extension is not connected');
-		}
+    try {
+      const response: ProfilesResponse = {
+        profiles: this.controller.getProfiles(),
+        active: this.controller.getActiveProfile(),
+      };
+      res.json(response);
+    } catch (error) {
+      this.logger.error('Failed to get profiles', error);
+      this.sendError(res, 500, 'INTERNAL_ERROR', 'Failed to get profiles');
+    }
+  }
 
-		const body: SetActiveProfileRequest = req.body;
+  private async handleSetActiveProfile(req: Request, res: Response): Promise<void> {
+    if (!this.listener.isConnected()) {
+      return this.sendError(res, 503, 'ROO_CODE_NOT_CONNECTED', 'Roo-Code extension is not connected');
+    }
 
-		if (!body.name) {
-			return this.sendError(res, 400, 'INVALID_REQUEST', 'Missing required field: name');
-		}
+    const body = req.body as SetActiveProfileRequest;
 
-		try {
-			const profile = await this.controller.setActiveProfile(body.name);
-			res.json({ status: 'activated', profile });
-		} catch (error) {
-			this.logger.error('Failed to set active profile', error);
-			this.sendError(res, 500, 'INTERNAL_ERROR', 'Failed to set active profile');
-		}
-	}
+    if (!body.name) {
+      return this.sendError(res, 400, 'INVALID_REQUEST', 'Missing required field: name');
+    }
 
-	private sendError(res: Response, status: number, code: string, message: string, details?: any): void {
-		const error: ApiError = {
-			code,
-			message,
-			details,
-		};
-		res.status(status).json({ error });
-	}
+    try {
+      const profile = await this.controller.setActiveProfile(body.name);
+      res.json({ status: 'activated', profile });
+    } catch (error) {
+      this.logger.error('Failed to set active profile', error);
+      this.sendError(res, 500, 'INTERNAL_ERROR', 'Failed to set active profile');
+    }
+  }
 
-	getRouter(): Router {
-		return this.router;
-	}
+  private sendError(res: Response, status: number, code: string, message: string, details?: unknown): void {
+    const error: ApiError = {
+      code,
+      message,
+      details,
+    };
+    res.status(status).json({ error });
+  }
+
+  getRouter(): Router {
+    return this.router;
+  }
 }

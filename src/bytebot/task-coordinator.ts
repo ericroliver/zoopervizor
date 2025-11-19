@@ -54,7 +54,7 @@ export class TaskCoordinator {
     delegation.roo_task_id = rooTaskId;
     delegation.updated_at = Date.now();
     this.rooTaskToDelegation.set(rooTaskId, delegationId);
-    
+
     this.logger.info(`Linked Roo task ${rooTaskId} to delegation ${delegationId}`);
   }
 
@@ -74,7 +74,9 @@ export class TaskCoordinator {
       delegation.error = error;
     }
 
-    if (status === DelegationStatus.COMPLETED || status === DelegationStatus.FAILED || status === DelegationStatus.CANCELLED) {
+    if (status === DelegationStatus.COMPLETED
+        || status === DelegationStatus.FAILED
+        || status === DelegationStatus.CANCELLED) {
       delegation.completed_at = Date.now();
       this.clearTimeout(delegationId);
     }
@@ -118,7 +120,7 @@ export class TaskCoordinator {
    */
   getActiveDelegations(): DelegationState[] {
     return Array.from(this.delegations.values()).filter(
-      d => d.status === DelegationStatus.PENDING || d.status === DelegationStatus.IN_PROGRESS
+      d => d.status === DelegationStatus.PENDING || d.status === DelegationStatus.IN_PROGRESS,
     );
   }
 
@@ -208,7 +210,7 @@ export class TaskCoordinator {
     completed: number;
     failed: number;
     cancelled: number;
-  } {
+    } {
     const delegations = Array.from(this.delegations.values());
     return {
       total: delegations.length,

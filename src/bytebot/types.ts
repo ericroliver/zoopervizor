@@ -2,7 +2,7 @@
  * Bytebot integration types for Zoopervizor
  */
 
-import { RooCodeEventName, ClineMessage, TokenUsage } from '../roo-code/types';
+import { RooCodeEventName } from '../roo-code/types';
 
 /**
  * Delegation status
@@ -103,6 +103,6 @@ export interface EventNormalizerContext {
   delegation: DelegationState;
   rooEvent: {
     name: RooCodeEventName;
-    data: any;
+    data: unknown;
   };
 }

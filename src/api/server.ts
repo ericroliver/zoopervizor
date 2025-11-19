@@ -1,4 +1,4 @@
-import express, { Express } from 'express';
+import express, { Express, Request, Response, NextFunction } from 'express';
 import { createServer, Server } from 'http';
 import { RooCodeController } from '../roo-code/controller';
 import { RooCodeListener } from '../roo-code/listener';
@@ -8,143 +8,143 @@ import { ApiRoutes } from './routes';
 import { BytebotAdapter } from '../bytebot/bytebot-adapter';
 
 export class ApiServer {
-	private app: Express;
-	private server: Server | null = null;
-	private wsHandler: WebSocketHandler;
-	private bytebotAdapter: BytebotAdapter;
-	private routes: ApiRoutes;
-	private logger: Logger;
-	private port: number;
+  private app: Express;
+  private server: Server | null = null;
+  private wsHandler: WebSocketHandler;
+  private bytebotAdapter: BytebotAdapter;
+  private routes: ApiRoutes;
+  private logger: Logger;
+  private port: number;
 
-	constructor(
-		controller: RooCodeController,
-		listener: RooCodeListener,
-		logger: Logger,
-		port: number = 3737
-	) {
-		this.logger = logger;
-		this.port = port;
-		this.app = express();
-		this.wsHandler = new WebSocketHandler(logger, controller);
-		this.bytebotAdapter = new BytebotAdapter(controller, this.wsHandler);
-		this.routes = new ApiRoutes(controller, listener, logger);
+  constructor(
+    controller: RooCodeController,
+    listener: RooCodeListener,
+    logger: Logger,
+    port: number = 3737,
+  ) {
+    this.logger = logger;
+    this.port = port;
+    this.app = express();
+    this.wsHandler = new WebSocketHandler(logger, controller);
+    this.bytebotAdapter = new BytebotAdapter(controller, this.wsHandler);
+    this.routes = new ApiRoutes(controller, listener, logger);
 
-		this.setupMiddleware();
-		this.setupRoutes();
-		
-		// Initialize BytebotAdapter (enabled by default)
-		this.bytebotAdapter.initialize(true);
-	}
+    this.setupMiddleware();
+    this.setupRoutes();
 
-	private setupMiddleware(): void {
-		// Parse JSON bodies
-		this.app.use(express.json());
+    // Initialize BytebotAdapter (enabled by default)
+    this.bytebotAdapter.initialize(true);
+  }
 
-		// CORS - disabled for localhost only
-		this.app.use((req, res, next) => {
-			res.header('Access-Control-Allow-Origin', '*');
-			res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-			res.header('Access-Control-Allow-Headers', 'Content-Type');
-			next();
-		});
+  private setupMiddleware(): void {
+    // Parse JSON bodies
+    this.app.use(express.json());
 
-		// Request logging
-		this.app.use((req, res, next) => {
-			this.logger.debug(`${req.method} ${req.path}`);
-			next();
-		});
-	}
+    // CORS - disabled for localhost only
+    this.app.use((req, res, next) => {
+      res.header('Access-Control-Allow-Origin', '*');
+      res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+      res.header('Access-Control-Allow-Headers', 'Content-Type');
+      next();
+    });
 
-	private setupRoutes(): void {
-		// Mount API routes
-		this.app.use('/', this.routes.getRouter());
+    // Request logging
+    this.app.use((req, res, next) => {
+      this.logger.debug(`${req.method} ${req.path}`);
+      next();
+    });
+  }
 
-		// 404 handler
-		this.app.use((req, res) => {
-			res.status(404).json({
-				error: {
-					code: 'NOT_FOUND',
-					message: `Route not found: ${req.method} ${req.path}`,
-				},
-			});
-		});
+  private setupRoutes(): void {
+    // Mount API routes
+    this.app.use('/', this.routes.getRouter());
 
-		// Error handler
-		this.app.use((err: any, req: any, res: any, next: any) => {
-			this.logger.error('API error', err);
-			res.status(500).json({
-				error: {
-					code: 'INTERNAL_ERROR',
-					message: 'Internal server error',
-					details: err.message,
-				},
-			});
-		});
-	}
+    // 404 handler
+    this.app.use((req, res) => {
+      res.status(404).json({
+        error: {
+          code: 'NOT_FOUND',
+          message: `Route not found: ${req.method} ${req.path}`,
+        },
+      });
+    });
 
-	async start(): Promise<void> {
-		return new Promise((resolve, reject) => {
-			try {
-				this.server = createServer(this.app);
+    // Error handler
+    this.app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
+      this.logger.error('API error', err);
+      res.status(500).json({
+        error: {
+          code: 'INTERNAL_ERROR',
+          message: 'Internal server error',
+          details: err.message,
+        },
+      });
+    });
+  }
 
-				// Initialize WebSocket server
-				this.wsHandler.initialize(this.server);
-				
-				// Link BytebotAdapter to WebSocketHandler for delegation handling
-				this.wsHandler.setBytebotAdapter(this.bytebotAdapter);
+  async start(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      try {
+        this.server = createServer(this.app);
 
-				this.server.listen(this.port, '0.0.0.0', () => {
-					this.logger.info(`API server started on http://0.0.0.0:${this.port} (accessible from all IPs)`);
-					this.logger.info(`WebSocket server available at ws://0.0.0.0:${this.port}/events`);
-					resolve();
-				});
+        // Initialize WebSocket server
+        this.wsHandler.initialize(this.server);
 
-				this.server.on('error', (error: any) => {
-					if (error.code === 'EADDRINUSE') {
-						this.logger.error(`Port ${this.port} is already in use`);
-						reject(new Error(`Port ${this.port} is already in use`));
-					} else {
-						this.logger.error('Server error', error);
-						reject(error);
-					}
-				});
-			} catch (error) {
-				this.logger.error('Failed to start API server', error);
-				reject(error);
-			}
-		});
-	}
+        // Link BytebotAdapter to WebSocketHandler for delegation handling
+        this.wsHandler.setBytebotAdapter(this.bytebotAdapter);
 
-	stop(): void {
-		if (this.server) {
-			this.wsHandler.close();
-			this.server.close(() => {
-				this.logger.info('API server stopped');
-			});
-			this.server = null;
-		}
-	}
+        this.server.listen(this.port, '0.0.0.0', () => {
+          this.logger.info(`API server started on http://0.0.0.0:${this.port} (accessible from all IPs)`);
+          this.logger.info(`WebSocket server available at ws://0.0.0.0:${this.port}/events`);
+          resolve();
+        });
 
-	getWebSocketHandler(): WebSocketHandler {
-		return this.wsHandler;
-	}
+        this.server.on('error', (error: NodeJS.ErrnoException) => {
+          if (error.code === 'EADDRINUSE') {
+            this.logger.error(`Port ${this.port} is already in use`);
+            reject(new Error(`Port ${this.port} is already in use`));
+          } else {
+            this.logger.error('Server error', error);
+            reject(new Error(`Server error: ${error.message}`));
+          }
+        });
+      } catch (error) {
+        this.logger.error('Failed to start API server', error);
+        reject(error instanceof Error ? error : new Error('Failed to start API server'));
+      }
+    });
+  }
 
-	getBytebotAdapter(): BytebotAdapter {
-		return this.bytebotAdapter;
-	}
+  stop(): void {
+    if (this.server) {
+      this.wsHandler.close();
+      this.server.close(() => {
+        this.logger.info('API server stopped');
+      });
+      this.server = null;
+    }
+  }
 
-	isRunning(): boolean {
-		return this.server !== null;
-	}
+  getWebSocketHandler(): WebSocketHandler {
+    return this.wsHandler;
+  }
 
-	getPort(): number {
-		return this.port;
-	}
+  getBytebotAdapter(): BytebotAdapter {
+    return this.bytebotAdapter;
+  }
 
-	setPort(port: number): void {
-		if (this.isRunning()) {
-			throw new Error('Cannot change port while server is running');
-		}
-		this.port = port;
-	}
+  isRunning(): boolean {
+    return this.server !== null;
+  }
+
+  getPort(): number {
+    return this.port;
+  }
+
+  setPort(port: number): void {
+    if (this.isRunning()) {
+      throw new Error('Cannot change port while server is running');
+    }
+    this.port = port;
+  }
 }
