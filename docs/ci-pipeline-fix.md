@@ -1,17 +1,38 @@
 # CI Pipeline Build Fix
 
 ## Problem
-The CI pipeline was failing with "out directory not found" error, indicating TypeScript compilation issues.
+The CI pipeline was failing with two distinct issues:
+1. "out directory not found" error indicating TypeScript compilation issues
+2. `vsce package` command failing with `ReferenceError: File is not defined` on Node.js 18.x
 
 ## Root Causes Identified
 
 1. **Platform-specific clean command**: The `clean` script used Unix-only commands (`rm -rf`), failing on Windows CI runners
-2. **Limited debugging information**: CI didn't provide enough details when compilation failed
-3. **Missing build verification**: No intermediate checks between steps
+2. **Node.js version incompatibility**: The `vsce package` command requires Node.js 20+ due to `undici` dependency requiring the `File` API (added in Node 20)
+3. **Limited debugging information**: CI didn't provide enough details when compilation failed
+4. **Missing build verification**: No intermediate checks between steps
 
 ## Solutions Implemented
 
-### 1. Cross-Platform Clean Script
+### 1. Node.js Version Constraint for Packaging
+**File**: [`.github/workflows/ci.yml`](../.github/workflows/ci.yml)
+
+The `vsce package` command requires Node.js 20+ because it depends on `undici` which uses the `File` API (introduced in Node.js 20).
+
+**Added condition to package step**:
+```yaml
+- name: Package extension
+  if: matrix.node-version == '20.x'  # Only package on Node 20+
+  run: npm run package
+```
+
+**Why This Matters**:
+- Compilation and testing still run on both Node 18.x and 20.x
+- Packaging only runs on Node 20.x where `vsce` works correctly
+- Ensures extension compatibility with Node 18.x runtime (VSCode requirement)
+- Avoids `ReferenceError: File is not defined` on Node 18.x
+
+### 2. Cross-Platform Clean Script
 **File**: [`package.json`](../package.json)
 
 **Before**:
@@ -29,7 +50,7 @@ The CI pipeline was failing with "out directory not found" error, indicating Typ
 - Uses Node.js built-in `fs` module (no external dependencies)
 - Handles missing directories gracefully with `force:true`
 
-### 2. Enhanced CI Workflow Debugging
+### 3. Enhanced CI Workflow Debugging
 **File**: [`.github/workflows/ci.yml`](../.github/workflows/ci.yml)
 
 **Added Steps**:
@@ -84,6 +105,24 @@ The CI pipeline was failing with "out directory not found" error, indicating Typ
        echo "✅ Build artifacts verified successfully"
    ```
 
+## Node.js Version Requirements
+
+### Runtime vs Build Time
+- **Extension Runtime**: Node.js 18+ (VSCode's embedded Node)
+- **Build/Compile**: Works on Node.js 18.x and 20.x
+- **Packaging (vsce)**: Requires Node.js 20+ due to undici dependency
+
+### CI Strategy
+```yaml
+matrix:
+  os: [ubuntu-latest, windows-latest, macos-latest]
+  node-version: [18.x, 20.x]  # Test on both versions
+```
+
+- **Compile & Test**: Runs on all matrix combinations (18.x and 20.x)
+- **Package**: Only runs on Node 20.x combinations
+- **Upload Artifact**: Only uploads from ubuntu-latest + Node 20.x
+
 ## Testing Results
 
 ### Local Testing (macOS)
@@ -105,6 +144,7 @@ The enhanced workflow now provides:
 - ✅ Explicit verification of critical files
 - ✅ Helpful error messages with context
 - ✅ Cross-platform compatibility
+- ✅ Node.js version-specific packaging (20.x only)
 
 ## Configuration Verified
 
